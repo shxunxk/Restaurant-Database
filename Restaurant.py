@@ -15,7 +15,7 @@ def start():
         start()
 
 def frontend():
-    ch = int(input("1. Take customer order\n2. Check order details and status\n3.Customer details\n4. Go back\n0. Exit\n"))
+    ch = int(input("1. Take customer order\n2. Check order details and status\n3. Customer details\n4. Go back\n0. Exit\n"))
 
     if(ch==1):
         customerorder()
@@ -42,83 +42,122 @@ def backend():
     elif(ch==2):
         foodmenu()
     elif(ch == 3):
-        typ = int(input('1.Chef\n2. Waiter'))
+        employeedetails()
+    elif(ch == 4):
+        hardwares()
     elif(ch == 5):
         start()
-        
 
 def customerorder():
-    cust_name = input("Enter the name of the customer\n")
-    cust_phone = input("Enter the phone number of the customer\n")
-    cust_email = input("Enter the email of the customer\n")
-    add = input("Enter the address of the customers\n")
-    m = 'Y'
-    order_dat = datetime.date.today()
-    cur.execute('select customer_id from customers where name = %d and phone = %d and email = %d',(cust_name, cust_phone, cust_email, add))
-    result = cur.fetchone()
-    if(not result):
-        cur.execute('insert into customers(name, phone, email, address) values(%s,%s,%s,%s)',cust_name, cust_phone, cust_email)
-    else:
-        cust_id = result[0]
-    cur.execute('insert into orders(order_date, customer_id) values(%d, %d)',(order_dat, cust_id))
-    conn.commit()
-    cur.execute('select product_id, product_name from products')
-    cur.fetchone()
-    ord_id = cur.execute('select order_id from orders where customer_id = cust_id and order_date = order_dat')
-    while(m == 'Y'):
-            prod_id = int(input("Enter the item"))
-            qty = int(input('Enter the quantity'))
-            cur.execute('insert into items(order_id, product_id, quantity) values(%d,%d, %d)',(ord_id, prod_id, qty))
-            m = input('Done (Y/N)')
+    try:
+        cust_name = input("Enter the name of the customer: ")
+        cust_phone = input("Enter the phone number of the customer: ")
+        cust_email = input("Enter the email of the customer: ")
+        add = input("Enter the address of the customer: ")
+        m = 'Y'
+        order_date = datetime.date.today()
+
+        cur.execute('SELECT customer_id FROM customers WHERE name = %s AND phone = %s AND email = %s', (cust_name, cust_phone, cust_email))
+        result = cur.fetchone()
+
+        if not result:
+            cur.execute('INSERT INTO customers(name, phone, email, address) VALUES (%s, %s, %s, %s) RETURNING customer_id', (cust_name, cust_phone, cust_email, add))
+            cust_id = cur.fetchone()[0]
+        else:
+            cust_id = result[0]
+
+        cur.execute('INSERT INTO orders(order_date, customer_id) VALUES (%s, %s) RETURNING order_id', (order_date, cust_id))
+        order_id = cur.fetchone()[0]
+
+        cur.execute('SELECT product_id, product_name FROM products')
+        cur.fetchone()
+
+        while m == 'Y':
+            prod_id = int(input("Enter the product ID: "))
+            qty = int(input('Enter the quantity: '))
+            cur.execute('INSERT INTO items(order_id, product_id, quantity) VALUES (%s, %s, %s)', (order_id, prod_id, qty))
+            m = input('Add another item? (Y/N): ')
+
+        conn.commit()
+        print("Order placed successfully!")
+
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
 
 def orderdetails():
-    cur.execute('select * from orders')
-    i = int(input('Enter the order_id\n'))
-    cur.execute('select items.item_id, products.product_name, items.quatity from items join products on items.product_id = products.product_id where items.order_id=i')
-    d = input('Delete the order? (Y/N)\n')
-    if(d == 'Y'):
-        cur.execute('select order_status_id from orders where order_id=%d',(i,))
-        result = cur.fetchone()
-        check = result[0]
-        if(check == 1):
-            cur.execute("delete from orders where order_id = %d",(i,))
-            conn.commit()
-        elif(check != 1):
-            print('Order cannot be deleted')
-        else:
-            print("Enter proper input\n")
-        
-
-def customerdetails():
-    cur.execute('select * from customers')
+    cur.execute('SELECT * FROM orders')
+    i = int(input('Enter the order_id: '))
+    
+    cur.execute('SELECT items.item_id, products.product_name, items.quantity FROM items JOIN products ON items.product_id = products.product_id WHERE items.order_id = %s', (i,))
     rows = cur.fetchall()
+    
+    if len(rows) == 0:
+        print('Order not found.')
+        return
+    
+    print('Order Details:')
     for row in rows:
-        tem = (list(row))
-        for i in tem:
-            print(i,end=' ')
-        print("")
-    e = int(input('\n1. Edit customer details\n2. Delete customer details\n3. Manually insert customer details'))
-    if(e == 2):
+        item_id, product_name, quantity = row
+        print(f'Item ID: {item_id}, Product Name: {product_name}, Quantity: {quantity}')
+    
+    d = input('Delete the order? (Y/N): ')
+    if d.upper() == 'Y':
+        cur.execute("SELECT order_status_id FROM orders WHERE order_id = %s", (i,))
+        result = cur.fetchone()
+        if result:
+            check = result[0]
+            if check == 1:
+                cur.execute("DELETE FROM orders WHERE order_id = %s", (i,))
+                conn.commit()
+                print('Order deleted successfully.')
+            else:
+                print('Order cannot be deleted because it has a different status.')
+        else:
+            print('Order not found.')
+    else:
+        print('Order not deleted.')
+        
+def customerdetails():
+    cur.execute('SELECT * FROM customers')
+    rows = cur.fetchall()
+    
+    if not rows:
+        print("No customer records found.")
+    else:
+        print("Customer Details:")
+        for row in rows:
+            customer_id, name, phone, email, address = row
+            print(f"Customer ID: {customer_id}")
+            print(f"Name: {name}")
+            print(f"Phone: {phone}")
+            print(f"Email: {email}")
+            print(f"Address: {address}")
+            print("-" * 30)
+
+    e = int(input('\n1. Edit customer details\n2. Delete customer details\n3. Manually insert customer details\n'))
+    if e == 2:
         iden = int(input('Enter the customer id to be deleted\n'))
-        cur.execute("delete from customers where customer_id = %d",(iden,))
+        cur.execute("DELETE FROM customers WHERE customer_id = %s", (iden,))
         conn.commit()
-    if(e == 1):
+    elif e == 1:
         iden = int(input('Enter the customer id to be changed\n'))
         name = input("Enter the new name\n")
         phone = input("Enter the new phone number\n")
         email = input("Enter the new email\n")
         add = input("Enter the new address\n")
-        cur.execute('update customers set customer_id = %d, name = %s, phone = %s, email = %s, add = %s',(iden,name,phone,email,add))
+        cur.execute('UPDATE customers SET name = %s, phone = %s, email = %s, address = %s WHERE customer_id = %s', (name, phone, email, add, iden))
         conn.commit()
 
 def inventorydetails():
-    cur.execute('select inventory_item_id, inventory_item_name from inventory_items')
-    rows=cur.fetchall()
+    cur.execute('SELECT inventory_item_id, inventory_item_name FROM inventory_items')
+    rows = cur.fetchall()
+    if not rows:
+        print('No inventory items found.')
+        return
+    print('Inventory Details:')
     for row in rows:
-        tem = (list(row))
-        for i in tem:
-            print(i,end=' ')
-        print("")
+        inventory_item_id, inventory_item_name = row
+        print(f'Inventory Item ID: {inventory_item_id}, Item Name: {inventory_item_name}')
 
 def foodmenu():
     cur.execute('select * from products;')
@@ -140,6 +179,36 @@ def foodmenu():
         cur.execute('delete row products where product_name = %s',(prd,))
         conn.commit()
 
+def employeedetails():
+    cur.execute("select * from employees")
+    rows = cur.fetchall()
+
+    if not rows:
+        print('No employees and currently contracted')
+    else:
+        for row in rows:
+            print("Employee Details")
+            emp_id, emp_name, pos, salary = row
+            print(f"Employee ID: {emp_id}")
+            print(f"Employee Name: {emp_name}")
+            print(f"Employee Position: {pos}")
+            print(f"Employee Salary: {salary}")
+
+    i  = input('Enter new employee details (Y/N)\n')
+    if(i == 'Y' or i=='y'):
+        cur.execute("insert into employees(employee_name, position, salary) values()")
+        conn.commit()
+    else:
+        return
+    
+    def hardwares():
+        print('Hardware')
+        cur.execute("SELECT * FROM hardwares")
+        i = input("Enter new hardware details (Y/N)\n")
+        ty, tot = input().split()
+        tot = int(tot)
+        cur.execute("insert into hardwares")
+            
 cur = None
 conn = None
 
