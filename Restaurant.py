@@ -44,7 +44,7 @@ def backend():
     elif(ch == 3):
         employeedetails()
     elif(ch == 4):
-        hardwares()
+        furniture()
     elif(ch == 5):
         start()
 
@@ -201,13 +201,21 @@ def employeedetails():
     else:
         return
     
-    def hardwares():
-        print('Hardware')
-        cur.execute("SELECT * FROM hardwares")
-        i = input("Enter new hardware details (Y/N)\n")
-        ty, tot = input().split()
+def furniture():
+    print('Hardware')
+    cur.execute("SELECT * FROM hardwares")
+    rows = cur.fetchall()
+    for row in rows:
+        fid, t, tota = row
+        print(fid, t, tota,"\n") 
+    i = input("Enter new hardware details (Y/N)\n")
+    if(i == 'Y' or i=='y'):
+        ty, tot = input("Enter the new hardware type and quantity").split()
         tot = int(tot)
-        cur.execute("insert into hardwares")
+        cur.execute("insert into hardwares(type, total) values(%s,%d)",(ty,tot))
+        conn.commit()
+    else:
+        return
             
 cur = None
 conn = None
