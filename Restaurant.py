@@ -180,6 +180,7 @@ def foodmenu():
         conn.commit()
 
 def employeedetails():
+    print("Employee Details")
     cur.execute("select * from employees")
     rows = cur.fetchall()
 
@@ -187,36 +188,63 @@ def employeedetails():
         print('No employees and currently contracted')
     else:
         for row in rows:
-            print("Employee Details")
             emp_id, emp_name, pos, salary = row
             print(f"Employee ID: {emp_id}")
             print(f"Employee Name: {emp_name}")
             print(f"Employee Position: {pos}")
             print(f"Employee Salary: {salary}")
 
-    i  = input('Enter new employee details (Y/N)\n')
-    if(i == 'Y' or i=='y'):
-        cur.execute("insert into employees(employee_name, position, salary) values()")
+    i  = input('1. Enter new employee details\n2. Edit employee details\n3. Delete employee details\n4. Go back\n5. Exit')
+    if(i == 1):
+        name, position, salary = input('Enter the new employee name, position and salary\n').split()
+        salary = int(salary)
+        cur.execute("insert into employees(employee_name, position, salary) values(%s,%s,%d)",(name, position, salary))
         conn.commit()
-    else:
-        return
+        print('Employee details entered successfully')
+    elif(i==2):
+        name, position, salary = input('Enter the employee name to be editted along with new position and salary\n').split()
+        salary = int(salary)
+        cur.execute("insert into employees(employee_name, position, salary) values(%s,%s,%d)",(name, position, salary))
+        conn.commit()
+        print('Employee details entered successfully')
+        
     
 def furniture():
     print('Hardware')
     cur.execute("SELECT * FROM hardwares")
     rows = cur.fetchall()
     for row in rows:
-        fid, t, tota = row
-        print(fid, t, tota,"\n") 
-    i = input("Enter new hardware details (Y/N)\n")
-    if(i == 'Y' or i=='y'):
-        ty, tot = input("Enter the new hardware type and quantity").split()
-        tot = int(tot)
-        cur.execute("insert into hardwares(type, total) values(%s,%d)",(ty,tot))
+        furniture_id, type, total = row
+        print(furniture_id, type, total,"\n") 
+    i = input("1. Enter new hardware details\n2. Edit hardware details\n 3. Delete haerdware details\n4. Go back\n5. Exit")
+    if(i == 1):
+        type, total = input("Enter the new hardware type and quantity").split()
+        total = int(total)
+        cur.execute("insert into hardwares(type, total) values(%s,%d)",(type,total))
         conn.commit()
+        print('Hardware details entered successfully')
+        furniture()
+    elif(i==2):
+        i = input('Enter the name of the type to be changed')
+        type, total = input('Enter the changed name of the type and the its quantity\n').split()
+        cur.execute("update hardwares set total = %d, type = %s where type = %s",(total,type,i))
+        conn.commit()
+        print('Hardware details edited successfully')
+        furniture()
+    elif(i==3):
+        type= input('Enter the name of the type which is to be deleted\n').split()
+        cur.execute("delete row hardwares where type= %s",(type))
+        conn.commit()
+        print('Hardware details deleted successfully')
+        furniture()
+    elif(i==5):
+        start()
+    elif(i==4):
+        backend()
     else:
-        return
-            
+        print('Enter a valid input')
+        furniture()
+
 cur = None
 conn = None
 
@@ -231,7 +259,7 @@ try:
 
     cur = conn.cursor()
 
-    print("\nOne Food World Database\n")
+    print("\nOne Food World\n")
     start()
 
     conn.commit()
