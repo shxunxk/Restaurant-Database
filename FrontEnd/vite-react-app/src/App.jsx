@@ -1,24 +1,19 @@
-import { BrowserRouter as Router, Link, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css'
 import Home from './Pages/Home'
+import About from './Pages/About'
+import Cart from './Pages/Cart';
 
 function App() {
-
   return (
-    <Router basename='/home'>
-      {/* <div>
-        <Link to="/">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </Link>
-        <Link to="/react">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </Link>
-      </div> */}
+    <Router basename="/home">
       <Routes>
-        <Route path='/' element={<Home/>}/>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/cart" element={<Cart />} />
       </Routes>
     </Router>
-  )
+  );
 }
 
 export default App
