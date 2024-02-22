@@ -10,10 +10,10 @@ export default function Options() {
       setSelected(index)
     }
   return (
-    <div className="flex justify-evenly">
+    <div className="flex justify-between">
       {options.map((item, index)=>(
-        <div key={index} className='h-8 w-1/5 border border-black-100'  style={{backgroundColor: index===selected? 'red' : 'white', borderTopLeftRadius: index === selected ? '10px' : '0px', borderTopRightRadius: index === selected ? '10px' : '0px',}} onClick={()=>changeStyle(index)}>
-            <p className="">{item}</p>
+        <div key={index} className='h-8 w-1/6 border border-black-100 rounded-md'  style={{backgroundColor: index===selected? 'blue' : 'white', borderTopRightRadius: index === selected ? '10px' : '0px', color: index === selected?'white':'black'}} onClick={()=>changeStyle(index)}>
+            <p className="font-bold">{item}</p>
         </div>
       ))}
     </div>
