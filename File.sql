@@ -1,0 +1,4 @@
+-- create table Customers()
+-- create table Orders()
+-- create table Items()
+-- create table Products()

@@ -6,12 +6,11 @@ import Slideshow from '../Components/SlideShow'
 
 export default function Home() {
   
-const food = [{name:'1'},{name:'2'}, {name:'1'},{name:'2'}, {name:'1'},{name:'2'}]
+const food = [{name:'1'},{name:'2'}, {name:'1'},{name:'2'}, {name:'1'},{name:'2'},{name:'1'},{name:'Xacuti'}]
 
   return (
     <div>
-      <Navbar/>
-      <Slideshow/>
+      {/* <Slideshow/> */}
       <div className='mt-20 mx-16'>
         <Options/>
         <div className='grid grid-cols-6 gap-12'>

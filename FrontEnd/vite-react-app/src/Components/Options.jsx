@@ -12,8 +12,8 @@ export default function Options() {
   return (
     <div className="flex justify-between">
       {options.map((item, index)=>(
-        <div key={index} className='h-8 w-1/6 border border-black-100 rounded-md'  style={{backgroundColor: index===selected? 'blue' : 'white', borderTopRightRadius: index === selected ? '10px' : '0px', color: index === selected?'white':'black'}} onClick={()=>changeStyle(index)}>
-            <p className="font-bold">{item}</p>
+        <div key={index} className='h-8 w-1/6 border border-black-100 rounded-md ' style={{backgroundColor: index===selected? 'blue' : 'white', borderTopRightRadius: index === selected ? '10px' : '0px', color: index === selected?'white':'black'}} onClick={()=>changeStyle(index)}>
+            <p className="font-bold flex items-center justify-center">{item}</p>
         </div>
       ))}
     </div>
