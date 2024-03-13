@@ -12,7 +12,7 @@ export default function Navbar() {
         <div className='flex'>
             <Link to='./about'><p className='text-white flex items-center justify-center pl-4'>About</p></Link>
             <Link to='./about'><p className='text-white flex items-center justify-center pl-4'>Account</p></Link>
-            <Link to='./about'><p className='text-white flex items-center justify-center pl-4'>Cart</p></Link>
+            <Link to='./about'><p className='text-white flex items-center justify-center pl-4'>Log Out</p></Link>
         </div>
       </nav>
     </div>

@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 // eslint-disable-next-line react/prop-types
-export default function Login({text1, text2, text3, text4}) {
+export default function Login({text1, text2, text3, text4, but}) {
 
 const [username, setUsername] = useState(null)
 const [password, setPassword] = useState(null)
@@ -32,8 +32,9 @@ const handleLogin = (e) => {
           {text3 && <label className='my-4'>
           <input type="text" value={repass} onChange={(e) => setRepass(e.target.value)} className="rounded-md shadow-lg p-2" style={{ width: '300px' }} placeholder={text3}></input>
           </label>}
-          <button type='submit' className='text-white mt-10 rounded-lg bg-black w-1/2 p-1.5 mb-10'>Login</button>
-          <Link to='../signin'>{text4}</Link>
+          <button type='submit' className='text-white mt-10 rounded-lg bg-black w-1/2 p-1.5 mb-10'>{but}</button>
+          {but == 'Log In' && <Link to='../signin'>{text4}</Link>}
+          {but == 'Sign In' && <Link to='../login'>{text4}</Link>}
           {!error && <p>{error}</p>}
         </div>
       </form>

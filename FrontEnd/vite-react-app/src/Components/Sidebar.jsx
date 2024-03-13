@@ -48,7 +48,13 @@ const Sidebar = () => {
                 <line x1="2" y1="3" x2="4" y2="5" />
                 <line x1="2" y1="5" x2="4" y2="3" />
                 </svg>
-
+                <div className='flex flex-col justify-start items-center text-white text-xl'>
+                    <ul className="flex flex-col justify-start items-center text-white text-xl">
+                        <li className="p-2">Orders</li>
+                        <li className="p-2">Inventory</li>
+                        <li className="p-2">Menu</li>
+                    </ul>
+                </div>
             </div>
         </div>
       )}
