@@ -5,7 +5,9 @@ import About from './Pages/About'
 import Cart from './Pages/Cart';
 import Login from './Pages/Login';
 import Orders from './Pages/Orders';
-// import Navbar from './Components/Navbar';
+import Bill from './Pages/Bill';
+import Customer from './Pages/Customer';
+import TakeOrder from './Pages/TakeOrder';
 
 function App() {
   return (
@@ -26,8 +28,20 @@ function App() {
         <Route path="orders">
           {/* <Navbar/> */}
           <Route index element={<Orders />}/>
-          <Route path="about" element={<About />} />
+          <Route path="newOrder" element={<TakeOrder />} />
           <Route path="cart" element={<Cart />} />
+        </Route>
+        <Route path="bill">
+          {/* <Navbar/> */}
+          <Route index element={<Bill />}/>
+          {/* <Route path="about" element={<About />} />
+          <Route path="cart" element={<Cart />} /> */}
+        </Route>
+        <Route path="customers">
+          {/* <Navbar/> */}
+          <Route index element={<Customer/>}/>
+          {/* <Route path="about" element={<About />} />
+          <Route path="cart" element={<Cart />} /> */}
         </Route>
       </Routes>
     </Router>

@@ -1,10 +1,14 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
-export default function Options() {
+export default function Options({getType}) {
 
     const options = ['Starter', 'Main', 'Sides', 'Drinks', 'Extras']
 
     const [selected, setSelected] = useState(0)
+
+    useEffect(()=>{
+      getType(options[selected])
+    },[selected])
 
     const changeStyle = (index) => {
       setSelected(index)
@@ -12,8 +16,8 @@ export default function Options() {
   return (
     <div className="flex justify-between">
       {options.map((item, index)=>(
-        <div key={index} className='h-8 w-1/6 border border-black-100 rounded-md ' style={{backgroundColor: index===selected? 'blue' : 'white', borderTopRightRadius: index === selected ? '10px' : '0px', color: index === selected?'white':'black'}} onClick={()=>changeStyle(index)}>
-            <p className="font-bold flex items-center justify-center">{item}</p>
+        <div key={index} className='flex-1 border border-b-gray-600 border-opacity-60' style={{backgroundColor: index===selected? 'blue' : 'white', color: index === selected?'white':'black'}} onClick={()=>changeStyle(index)}>
+            <p className="font-bold text-center p-1 hover:bg-blue-300  hover:text-white">{item}</p>
         </div>
       ))}
     </div>

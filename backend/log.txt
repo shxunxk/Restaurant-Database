@@ -1,0 +1,38 @@
+
+1716816677872: ::1 GET: /menu/Starter
+
+1716816677891: ::1 GET: /menu/Starter
+
+1716816684206: ::1 GET: /menu/Main
+
+1716816685040: ::1 GET: /menu/Starter
+
+1716816685772: ::1 GET: /menu/Sides
+
+1716816686254: ::1 GET: /menu/Main
+
+1716816714516: ::1 GET: /menu/Starter
+
+1716816715986: ::1 GET: /menu/Starter
+
+1716816715993: ::1 GET: /menu/Starter
+
+1716817159197: ::1 GET: /menu/Starter
+
+1716817159204: ::1 GET: /menu/Starter
+
+1716817473883: ::1 GET: /menu/Starter
+
+1716817473890: ::1 GET: /menu/Starter
+
+1716817634191: ::1 GET: /menu/Starter
+
+1716817634197: ::1 GET: /menu/Starter
+
+1716817652141: ::1 GET: /api/orders
+
+1716817657485: ::1 GET: /
+
+1716817670055: ::1 GET: /menu/type
+
+1716817692192: ::1 GET: /menu/type
