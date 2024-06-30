@@ -40,20 +40,43 @@ const createMenuItem = async (req, res) => {
   }
 };
 
+const updateMenuItem = async (req, res) => {
+
+  const { item_id, item_name, price, image, item_type } = req.body;
+
+  if (!item_id || !item_name || !price || !image || !item_type) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  try {
+    const item = await Menu.findByPk(item_id);
+    if (!item) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+
+    item.item_name = item_name;
+    item.price = price;
+    item.image = image;
+    item.item_type = item_type;
+    await item.save();
+
+    res.status(200).json({ message: 'Item updated successfully', item });
+  } catch (error) {
+    console.error('Error updating item:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 const deleteMenuItem = async (req, res) => {
   try {
-    
-    const { itemType, itemId } = req.body;
+    console.log(req.body);
+    const { itemId } = req.body;
 
-    let menuItem;
-
-    if (itemType === 'item_id') {
-      menuItem = await Menu.findByPk(itemId);
-    } else if (itemType === 'item_name') {
-      menuItem = await Menu.findOne({ where: { item_name: itemId } });
-    } else {
+    if (!itemId) {
       return res.status(400).json({ error: 'Invalid itemType. Must be "id" or "name".' });
     }
+
+    const menuItem = await Menu.findOne({ where: { item_id: itemId } });
 
     if (!menuItem) {
       return res.status(404).json({ error: 'Menu item not found' });
@@ -67,8 +90,10 @@ const deleteMenuItem = async (req, res) => {
   }
 };
 
+
 module.exports = {
   getMenu,
   createMenuItem,
   deleteMenuItem,
+  updateMenuItem
 };

@@ -8,11 +8,14 @@ import Orders from './Pages/Orders';
 import Bill from './Pages/Bill';
 import Customer from './Pages/Customer';
 import TakeOrder from './Pages/TakeOrder';
+import Navbar from './Components/Navbar'
+import OrderItems from './Pages/orderItems';
 
 function App() {
   return (
     <Router>
-      <Routes>
+      <Navbar/>
+      <Routes baseUrl='login'>
         <Route path="login">
           <Route index element={<Login text1='Enter Username' text2 = 'Enter Password' text4='New to this site' but='Log In'/>}/>
         </Route>
@@ -29,7 +32,7 @@ function App() {
           {/* <Navbar/> */}
           <Route index element={<Orders />}/>
           <Route path="newOrder" element={<TakeOrder />} />
-          <Route path="cart" element={<Cart />} />
+          <Route path="orderItems/:id" element={<OrderItems />} />
         </Route>
         <Route path="bill">
           {/* <Navbar/> */}

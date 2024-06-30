@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-key */
-import Navbar from '../Components/Navbar';
 import Options from '../Components/Options';
 import FoodCard from '../Components/FoodCard';
 // import Slideshow from '../Components/SlideShow'
@@ -10,10 +9,12 @@ export default function Home() {
   const [type, setType] = useState('Starter');
   const [showNewItemForm, setShowNewItemForm] = useState(false);
   const [food, setFood] = useState([]);
+  const [card, setCard] = useState(false);
+  const [cardItem, setCardItem] = useState({});
 
   const getType = (data) => {
-    setType(data)
-  }
+    setType(data);
+  };
 
   const [newItem, setNewItem] = useState({
     item_name: '',
@@ -22,35 +23,98 @@ export default function Home() {
     item_type: type
   });
 
-  useEffect(() => {
+  const [selectedItem, setSelectedItem] = useState({
+    item_name: '',
+    price: '',
+    image: '',
+    item_type: '',
+    item_id: ''
+  });
 
-    // setNewItem(prevState=>{
-    //   prevState, [item_type]: type
-    // })
-
+  const getMenu = () =>{
     axios.get('http://localhost:3000/menu', {
       params: { type: type }
     })
       .then(response => {
+        console.log(response.data)
         setFood(response.data);
       })
       .catch(error => {
         console.error('Error:', error);
       });
-  }, [type]);
+  }
 
-  console.log(food)
+  useEffect(() => {
+    getMenu()
+    setCard(false)
+    setNewItem({
+      item_name: '',
+      price: '',
+      image: '',
+      item_type: type
+    })
+  }, [type]);
 
   const handleToggleNewItemForm = () => {
     setShowNewItemForm(!showNewItemForm);
+    setSelectedItem({
+      item_name: '',
+      price: '',
+      image: '',
+      item_type: type
+    });
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewItem(prevState => {
-        return { ...prevState, [name]: value };
-    });
+    setNewItem(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
   };
+
+  const handleFoodDetails = (e) => {
+    const { name, value } = e.target;
+    setSelectedItem(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+
+  const updateFood = () => {
+    axios.put('http://localhost:3000/menu', {
+      item_id: selectedItem.item_id,
+      item_name: selectedItem.item_name,
+      price: selectedItem.price,
+      image: selectedItem.image,
+      item_type: selectedItem.item_type
+    })
+      .then(response => {
+        getMenu()
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    setCard(false);
+  };
+  
+  const deleteItem = () => {
+    const requestData = {
+      itemId: selectedItem.item_id // assuming selectedItem.item_id is the identifier of the item
+    };
+    
+    axios.delete('http://localhost:3000/menu', { data: requestData })
+      .then(response => {
+        // Handle success
+        console.log('Item deleted successfully', response.data);
+        getMenu()
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+
+  };
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -63,32 +127,87 @@ export default function Home() {
           image: '',
           item_type: type
         });
+        // Fetch updated food data here if necessary
       })
       .catch(error => {
         console.error('Error:', error);
       });
   };
 
+  const showCard = (bool, item) => {
+    if (bool) {
+      setCard(true);
+      setSelectedItem({
+        item_name: item.item_name,
+        price: item.price,
+        image: item.image,
+        item_type: item.item_type,
+        item_id: item.item_id
+      });
+    } else {
+      setCard(false);
+    }
+    setCardItem(item);
+  };
+
   return (
     <div>
-      <Navbar />
-      <div className='my-20 mx-16'>
+      <div className='my-20 mx-4 sm:mx-16'>
         <Options getType={getType} />
-        <div className='grid grid-cols-6 gap-12'>
+        <div>
+          {card && (
+            <div className='flex flex-col items-center gap-10 border my-10 p-10 rounded-xl border-gray-400 sm:flex-row'>
+              <div className='flex flex-col gap-10 justify-center'>
+              <img src={cardItem.image} alt={cardItem.item_name} className='rounded-lg min-h-32 w-full'/>
+              <button className='w-full bg-red-400 p-2 rounded-lg sm:w-fit self-center' onClick={deleteItem}>Delte Item</button>
+              </div>
+              <div className='rounded-lg my-10 flex flex-col items-center flex-1'>
+                {Object.keys(cardItem).map((item) => {
+                  let field = null;
+                  if (item === 'item_name') {
+                    field = 'Item Name';
+                  } else if (item === 'item_type') {
+                    field = 'Item Type';
+                  } else if (item === 'image') {
+                    field = 'Item Image';
+                  } else if (item === 'price') {
+                    field = 'Item Price';
+                  }
+                  return (
+                    <div className='flex flex-row gap-2 my-4 w-full justify-center' key={item}>
+                      {field && (
+                        <div className='sm:flex flex-row'>
+                          <p className="flex items-center">{field}:</p>
+                          <input
+                            type='text'
+                            id={item}
+                            name={item}
+                            value={selectedItem[item]}
+                            className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+                            placeholder='Enter'
+                            onChange={handleFoodDetails}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+                <div className='w-full flex gap-2'>
+                  <button className='w-1/2 bg-green-400 p-2 rounded-lg' onClick={updateFood}>Save</button>
+                  <button className='w-1/2 bg-red-400 p-2 rounded-lg' onClick={() => showCard(false)}>Close</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className='grid gap-12 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8'>
           {food.map((item) => (
-            <div className='mt-10 justify-between'>
+            <div className='mt-10 justify-between' key={item.id} onClick={() => showCard(true, item)}>
               <FoodCard items={item} />
             </div>
           ))}
         </div>
-        <div className='flex justify-center'>
-          <button 
-            className='m-10 p-2 text-black rounded-lg bg-green-300 hover:bg-blue-300 hover:text-white' 
-            onClick={handleToggleNewItemForm}
-          >
-            {showNewItemForm ? 'Close' : 'Add New Item'}
-          </button>
-        </div>
+
         {showNewItemForm && (
           <div className='w-full flex justify-center mt-10'>
             <form className='w-full p-6 rounded-lg shadow-md' onSubmit={handleSubmit}>
@@ -128,10 +247,9 @@ export default function Home() {
                   type='text'
                   id='item_type'
                   name='item_type'
-                  value={newItem.item_type}
-                  onChange={handleInputChange}
+                  value={type}
                   className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
-                  placeholder='Enter item name'
+                  placeholder='Enter item type'
                 />
               </div>
               <div className='mb-4'>
@@ -151,12 +269,21 @@ export default function Home() {
               <button
                 type='submit'
                 className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
+                onClick={getMenu}
               >
                 Add Item
               </button>
             </form>
           </div>
         )}
+        <div className='flex justify-center'>
+          <button
+            className='w-32 m-10 p-2 text-black rounded-lg bg-green-300 hover:bg-blue-300 hover:text-white'
+            onClick={handleToggleNewItemForm}
+          >
+            {showNewItemForm ? 'Close' : 'Add New Item'}
+          </button>
+        </div>
       </div>
     </div>
   );

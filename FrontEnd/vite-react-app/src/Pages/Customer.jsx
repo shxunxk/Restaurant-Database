@@ -19,13 +19,12 @@ export default function Customers() {
         console.error('There was an error!', error);
       });
   }, []);  
-  console.log(data)
+
   return (
     <>
-    <Navbar/>
-    <div className="mt-20 mx-36 grid grid-cols-3 gap-5">
+    <div className="mt-20 mx-4 sm:mx-16 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-10">
       {data && data.length>0 && data.map((item,index)=>(
-        <Slip data={item}/>
+        <Slip key={index} data={item} button={['Edit','Delete']}/>
       ))}
     </div>
     </>

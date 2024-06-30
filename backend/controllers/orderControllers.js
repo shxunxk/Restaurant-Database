@@ -51,8 +51,34 @@ const updateStatus = async (req, res) => {
   }
 };
 
+const deleteOrder = async (req, res) => {
+  const { order_id } = req.body;
+
+  if (!order_id) {
+    return res.status(400).json({ error: 'order_id and status are required' });
+  }
+
+  try {
+    const order = await Order.findByPk(order_id);
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    if (!order) {
+      return res.status(404).json({ error: 'Menu item not found' });
+    }
+
+    await order.destroy();
+
+    res.status(200).json({ message: 'Menu item deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getOrder,
   createOrder,
-  updateStatus
+  updateStatus,
+  deleteOrder
 };

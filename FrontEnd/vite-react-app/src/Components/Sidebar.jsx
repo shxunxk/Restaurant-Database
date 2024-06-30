@@ -10,12 +10,12 @@ const Sidebar = () => {
         width: '50px',
         height: '50px',
         borderRadius: '50%',
-        background: '#333',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         cursor: 'pointer',
       }}
+      className='transparent'
       onClick={() => setCond(!cond)}
     >
       {!cond && (
@@ -35,25 +35,27 @@ const Sidebar = () => {
       )}
       {cond && (
         <div className="sidebar-menu">
-            <div className="fixed top-0 left-0 h-full w-48 bg-gray-800 p-1">
-                <svg
+            <div className="fixed top-0 left-0 h-full w-48 bg-white border-r border-gray-400">
+              <div className='bg-blue-600 h-16 flex justify-start items-center'>
+              <svg
                 xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
+                viewBox="0 0 12 12"
                 fill="none"
                 stroke="white"
-                strokeWidth="0.5"
+                strokeWidth="0.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 >
-                <line x1="2" y1="3" x2="4" y2="5" />
-                <line x1="2" y1="5" x2="4" y2="3" />
+                <line x1="1" y1="6.5" x2="2" y2="5.5" />
+                <line x1="1" y1="5.5" x2="2" y2="6.5" />
                 </svg>
-                <div className='flex flex-col justify-middle align-start items-center text-white '>
-                    <ul className="flex flex-col text-white text-2xl">
-                        <li className="p-2"><Link to='/orders'>Orders</Link></li>
-                        <li className="p-2"><Link to='/bill'>Bills</Link></li>
-                        <li className="p-2"><Link to='/menu'>Menu</Link></li>
-                        <li className="p-2"><Link to='/customers'>Customers</Link></li>
+              </div>
+                <div className='flex flex-col flex-1 justify-middle align-start items-center text-gray-600'>
+                    <ul className="flex flex-col text-xl my-4">
+                        <li className="p-2 hover:text-2xl"><Link to='/orders'>Orders</Link></li>
+                        <li className="p-2 hover:text-2xl"><Link to='/bill'>Bills</Link></li>
+                        <li className="p-2 hover:text-2xl"><Link to='/menu'>Menu</Link></li>
+                        <li className="p-2 hover:text-2xl"><Link to='/customers'>Customers</Link></li>
                     </ul>
                 </div>
             </div>

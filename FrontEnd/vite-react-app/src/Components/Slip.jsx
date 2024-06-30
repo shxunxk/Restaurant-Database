@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 
 // eslint-disable-next-line react/prop-types
-export default function Slip({data, category, status}) {
+export default function Slip({data, category, status, button}) {
 
   const changeStatus = async () => {
     try {
@@ -20,9 +20,18 @@ export default function Slip({data, category, status}) {
         console.log(response.data);
         // Optionally, you can update the local state or refetch data to reflect the status change
       }
+
+      if(currentIndex === status.length-1){
+        const response = await axios.put('http://localhost:3000/order', {
+          order_id: data.order_id,
+          status: 'Served'
+        });
+        console.log(response.data);
+      }
     } catch (error) {
       console.error('Error:', error);
     }
+    
   };
 
   const backStatus = async () => {
@@ -40,6 +49,13 @@ export default function Slip({data, category, status}) {
         });
         console.log(response.data);
         // Optionally, you can update the local state or refetch data to reflect the status change
+      }
+
+      if(currentIndex === 0){
+        const response = await axios.delete('http://localhost:3000/order', {
+          order_id: data.order_id,
+        });
+        console.log(response.data);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -90,8 +106,8 @@ export default function Slip({data, category, status}) {
         ) 
         })}
       <div className='flex justify-end mt-4 gap-2'>
-      <button className="bg-green-300 py-1 px-2 rounded-md" onClick={()=>changeStatus()}>Change</button>
-      <button className="bg-red-300 py-1 px-2 rounded-md" onClick={()=>backStatus()}>Back</button>
+      <button className="bg-green-300 py-1 px-2 rounded-md" onClick={()=>changeStatus()}>{button[0]}</button>
+      <button className="bg-red-300 py-1 px-2 rounded-md" onClick={()=>backStatus()}>{button[1]}</button>
       </div>
     </div>
   )
