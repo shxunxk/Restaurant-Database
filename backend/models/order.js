@@ -5,7 +5,7 @@ const Order = sequelize.define('Bill', {
   order_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    autoIncrement: true,
+    allowNull: false,
   },
   order_status: {
     type: DataTypes.STRING,

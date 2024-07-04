@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import './App.css'
 import Menu from './Pages/Menu'
 import About from './Pages/About'
@@ -15,7 +15,8 @@ function App() {
   return (
     <Router>
       <Navbar/>
-      <Routes baseUrl='login'>
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" />} />
         <Route path="login">
           <Route index element={<Login text1='Enter Username' text2 = 'Enter Password' text4='New to this site' but='Log In'/>}/>
         </Route>

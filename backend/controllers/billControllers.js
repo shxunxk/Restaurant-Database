@@ -1,4 +1,5 @@
 const Bill = require('../models/bill');
+const generateIntId = require('../generateId');
 
 const getBill = async (req, res) => {
   const {bill_id} = req.body
@@ -20,18 +21,16 @@ const getBill = async (req, res) => {
 const createBill = async (req, res) => {
   try {
     const {customer_id} = req.body;
-    // Check if required fields are provided
     if (!customer_id) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
+    const intId = generateIntId(3);
     const menuItem = await Bill.create({
-      customer_id: customer_id
+      bill_id:intId, customer_id: customer_id
     });
 
-    // Respond with the created menu item
     res.status(201).json(menuItem);
   } catch (error) {
-    // Handle errors
     res.status(500).json({ error: error.message });
   }
 };

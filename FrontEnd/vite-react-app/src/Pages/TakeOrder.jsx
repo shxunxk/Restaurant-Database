@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import axios from 'axios';
 
 export default function TakeOrder() {
-    const options = ['Starter', 'Main', 'Sides', 'Drinks', 'Extras'];
+    const options = new Set();
     const [data, setData] = useState([]);
     const [bill, setBill] = useState({});
     const [selectedItems, setSelectedItems] = useState([]);
-    const [customerToken, setCustomerToken] = useState();
+    const [customerToken, setCustomerToken] = useState({id:""});
 
     useEffect(() => {
         const getOrder = async () => {
@@ -30,22 +30,37 @@ export default function TakeOrder() {
                 console.error('Error fetching bills:', error);
             }
         };
-
         getOrder();
         getBill();
     }, []);
 
-    const handleChange = (e) => {
-        setCustomerToken(e.target.value);
-    };
+    data.map((item)=>{
+        options.add(item?.item_type)
+    })
 
+    const handleChange = (e) => {
+        setCustomerToken(prevState => ({
+            ...prevState,
+            [e.target.name]: e.target.value
+        }));
+    };
+    
     const genOrder = async () => {
         try {
-            const orderData = {
-                customerToken
-            };
-            const response = await axios.post('http://localhost:3000/orders', orderData);
+            const billId = bill[customerToken.id]||null;
+            let response = await axios.post('http://localhost:3000/order', {
+                bill_id: billId,
+                customer_id: customerToken.id
+            });
             console.log('Order placed successfully:', response.data);
+            for (const item of selectedItems) {
+                await axios.post('http://localhost:3000/orderitems', {
+                    order_id: response.data.order_id,
+                    item_id: item.item_id,
+                    quant: item.quant
+                });
+            }
+            setSelectedItems([])
         } catch (error) {
             console.error('Error placing order:', error);
         }
@@ -63,16 +78,27 @@ export default function TakeOrder() {
                 };
                 return updatedItems;
             } else {
-                // Add the new item
                 return [...prevItems, { item_id: item.item_id, item_name: item.item_name, quant: 1 }];
             }
         });
     };
 
+    const reduceItem = (item_id) => {
+        setSelectedItems(prevItems => {
+            return prevItems.map(item => {
+                if (item.item_id === item_id) {
+                    const newQuant = item.quant - 1;
+                    return { ...item, quant: newQuant > 0 ? newQuant : 0 };
+                }
+                return item;
+            }).filter(item => item.quant > 0); // Remove item if quantity is zero
+        });
+    };
+
     return (
         <div>
-            <div className='my-20 mx-16 flex gap-16'>
-                {selectedItems.length > 0 && (
+            <div className='my-20 mx-4 md:flex sm:mx-16 gap-16'>
+                {selectedItems?.length > 0 && (
                     <div className="flex-1">
                         <h1 className="text-2xl font-bold">Items</h1>
                         <table className="w-full mt-5 text-left">
@@ -88,26 +114,34 @@ export default function TakeOrder() {
                                     <tr key={index} className="border-b border-gray-300">
                                         <td className="py-2 px-4 w-1/6">{index + 1}</td>
                                         <td className="py-2 px-4 col-span-7">{item.item_name}</td>
-                                        <td className="py-2 px-4 w-1/6">{item.quant}</td>
+                                        <td className="py-2 px-4 w-1/6">{item.quant} <button onClick={() => reduceItem(item.item_id)} className="bg-red-500 text-white px-2 py-1 rounded">-</button></td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                         <form onSubmit={(e) => { e.preventDefault(); genOrder(); }}>
-                            <input value={customerToken} onChange={handleChange} placeholder="Enter customer email" />
+                            <p>ID:</p>
+                            <input value={customerToken.id} id={'id'}
+                            name={'id'} onChange={handleChange} placeholder="Enter customer id" />
+                            {/* <input value={customerToken.email} id={customerToken.email}
+                            name={customerToken.email} onChange={handleChange} placeholder="Enter customer email" />
+                            <input value={customerToken} id={customerToken.email}
+                            name={customerToken.email} onChange={handleChange} placeholder="Enter customer email" />
+                            <input value={customerToken} id={customerToken.email}
+                            name={customerToken.email} onChange={handleChange} placeholder="Enter customer email" /> */}
                             <button type="submit">Proceed</button>
                         </form>
                     </div>
                 )}
-                <div className="w-3/5">
-                    {options.map((option, index) => (
+                <div className="w-full">
+                    {Array.from(options)?.map((option, index) => (
                         <div key={index}>
                             <h1 className="text-xl font-bold mb-4">{option}</h1>
-                            <div className="grid grid-cols-4 mb-10">
+                            <div className="grid xs:grid-cols-1 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-10 mb-10">
                                 {data.map((food, index1) => (
                                     food.item_type === option && (
-                                        <div key={index1} className="text-center m-2 hover:bg-black" onClick={() => addItem(food)}>
-                                            <p className="h-10 flex items-center justify-center bg-gray-200 rounded-md">{food.item_name}</p>
+                                        <div key={index1} className="h-fit text-center m-2 hover:bg-black" onClick={() => addItem(food)}>
+                                            <p className="h-fit p-2 w-18 flex items-center justify-center bg-gray-200 rounded-md">{food.item_name}</p>
                                         </div>
                                     )
                                 ))}

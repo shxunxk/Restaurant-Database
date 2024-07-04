@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/jsx-key */
 import Options from '../Components/Options';
 import FoodCard from '../Components/FoodCard';
@@ -6,7 +8,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 export default function Home() {
-  const [type, setType] = useState('Starter');
+  const [options, setOptions] = useState(new Set())
+  const [type, setType] = useState();
   const [showNewItemForm, setShowNewItemForm] = useState(false);
   const [food, setFood] = useState([]);
   const [card, setCard] = useState(false);
@@ -43,6 +46,15 @@ export default function Home() {
         console.error('Error:', error);
       });
   }
+
+  
+  food.map((item)=>{
+    options.add(item?.item_type)
+    if(options.length === 1){
+      setType(item?.item_type)
+    }
+  })
+ 
 
   useEffect(() => {
     getMenu()
@@ -153,7 +165,7 @@ export default function Home() {
   return (
     <div>
       <div className='my-20 mx-4 sm:mx-16'>
-        <Options getType={getType} />
+        <Options getType={getType} options={options} />
         <div>
           {card && (
             <div className='flex flex-col items-center gap-10 border my-10 p-10 rounded-xl border-gray-400 sm:flex-row'>

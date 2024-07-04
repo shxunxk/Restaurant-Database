@@ -5,7 +5,7 @@ const Bill = sequelize.define('Bill', {
   bill_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    autoIncrement: true,
+    allowNull: false,
   },
   payment_status: {
     type: DataTypes.STRING,

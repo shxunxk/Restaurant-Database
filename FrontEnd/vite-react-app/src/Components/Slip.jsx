@@ -1,5 +1,8 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { Link } from 'react-router-dom';
 
 // eslint-disable-next-line react/prop-types
 export default function Slip({data, category, status, button}) {
@@ -57,6 +60,7 @@ export default function Slip({data, category, status, button}) {
         });
         console.log(response.data);
       }
+      window.alert('Status altered')
     } catch (error) {
       console.error('Error:', error);
     }
@@ -101,13 +105,15 @@ export default function Slip({data, category, status, button}) {
         }
         return(
           <>
+          <Link to={`./orderItems/${data.order_id}`}>
             <p key={index}>{field}: {data[item]||'NA'}</p>
+          </Link>
           </>
         ) 
         })}
-      <div className='flex justify-end mt-4 gap-2'>
-      <button className="bg-green-300 py-1 px-2 rounded-md" onClick={()=>changeStatus()}>{button[0]}</button>
-      <button className="bg-red-300 py-1 px-2 rounded-md" onClick={()=>backStatus()}>{button[1]}</button>
+      <div className='flex justify-end mt-4 gap-2 z-1'>
+      <button className="bg-green-300 py-1 px-2 rounded-md z-2" onClick={()=>changeStatus()}>{button[0]}</button>
+      <button className="bg-red-300 py-1 px-2 rounded-md z-2" onClick={()=>backStatus()}>{button[1]}</button>
       </div>
     </div>
   )
