@@ -6,6 +6,7 @@ const orderRoutes = require('./routes/order');
 const {sequelize} = require('./config/config');
 const orderItemsRoutes = require('./routes/order_items');
 const customerRoutes = require('./routes/customers');
+const loginRoutes = require('./routes/login');
 const cors = require('cors');
 
 const app = express();
@@ -21,6 +22,7 @@ app.use('/bill', billRoutes);
 app.use('/order', orderRoutes);
 app.use('/orderitems', orderItemsRoutes);
 app.use('/customers', customerRoutes);
+app.use('/login', loginRoutes);
 
 sequelize.sync()
   .then(() => {

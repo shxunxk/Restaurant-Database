@@ -10,18 +10,19 @@ import Customer from './Pages/Customer';
 import TakeOrder from './Pages/TakeOrder';
 import Navbar from './Components/Navbar'
 import OrderItems from './Pages/orderItems';
+import Start from './Pages/Start';
 
 function App() {
   return (
     <Router>
       <Navbar/>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="login">
-          <Route index element={<Login text1='Enter Username' text2 = 'Enter Password' text4='New to this site' but='Log In'/>}/>
+        <Route path='/' element={<Start/>}/>
+        <Route path="login/:type">
+          <Route index element={<Login text2 = 'Enter Password' text4='New to this site' but='Log In'/>}/>
         </Route>
         <Route path="signin">
-          <Route index element={<Login text1='Enter Email or Phone Number' text2 = 'Enter Password' text3 = 'Renter Password' text4='Already signed in' but='Sign In'/>}/>
+          <Route index element={<Login text2 = 'Enter Password' text3 = 'Renter Password' text4='Already signed in' but='Sign In'/>}/>
         </Route>
         <Route path="menu">
           {/* <Navbar/> */}

@@ -35,7 +35,7 @@ const Sidebar = () => {
       )}
       {cond && (
         <div className="sidebar-menu">
-            <div className="fixed top-0 left-0 h-full w-48 bg-white border-r border-gray-400">
+            <div className="fixed top-0 left-0 h-auto w-48 bg-white border-r border-gray-400">
               <div className='bg-blue-600 h-16 flex justify-start items-center'>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -50,13 +50,17 @@ const Sidebar = () => {
                 <line x1="1" y1="5.5" x2="2" y2="6.5" />
                 </svg>
               </div>
-                <div className='flex flex-col flex-1 justify-middle align-start items-center text-gray-600'>
+                <div className='flex flex-col h-full flex-1 justify-between justify-middle p-3 text-gray-600'>
                     <ul className="flex flex-col text-xl my-4">
                         <li className="p-2 hover:text-2xl"><Link to='/orders'>Orders</Link></li>
                         <li className="p-2 hover:text-2xl"><Link to='/bill'>Bills</Link></li>
                         <li className="p-2 hover:text-2xl"><Link to='/menu'>Menu</Link></li>
                         <li className="p-2 hover:text-2xl"><Link to='/customers'>Customers</Link></li>
                     </ul>
+                    <li className='flex justify-between p-4 h-fit items-center'>
+                      <img src={'vite.svg'} className='h-full bg-gray-200 p-2' style={{borderRadius:'50%'}}/>
+                      <p>My Account</p>
+                    </li>
                 </div>
             </div>
         </div>

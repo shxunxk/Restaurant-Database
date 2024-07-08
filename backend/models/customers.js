@@ -19,10 +19,13 @@ const Customer = sequelize.define('Customer', {
   },
   address: {
     type: DataTypes.STRING,
+  },
+  password: {
+    type: DataTypes.STRING,
   }
 }, {
   tableName: 'customers',
   timestamps: false
 });
 
-module.exports = Customer;
+module.exports = {Customer};

@@ -38,12 +38,12 @@ export default function TakeOrder() {
         options.add(item?.item_type)
     })
 
-    const handleChange = (e) => {
-        setCustomerToken(prevState => ({
-            ...prevState,
-            [e.target.name]: e.target.value
-        }));
-    };
+    // const handleChange = (e) => {
+    //     setCustomerToken(prevState => ({
+    //         ...prevState,
+    //         [e.target.name]: e.target.value
+    //     }));
+    // };
     
     const genOrder = async () => {
         try {
@@ -119,18 +119,19 @@ export default function TakeOrder() {
                                 ))}
                             </tbody>
                         </table>
-                        <form onSubmit={(e) => { e.preventDefault(); genOrder(); }}>
+                        {/* <form onSubmit={(e) => { e.preventDefault(); genOrder(); }}>
                             <p>ID:</p>
                             <input value={customerToken.id} id={'id'}
-                            name={'id'} onChange={handleChange} placeholder="Enter customer id" />
+                            name={'id'} onChange={handleChange} placeholder="Enter customer id" /> */}
                             {/* <input value={customerToken.email} id={customerToken.email}
                             name={customerToken.email} onChange={handleChange} placeholder="Enter customer email" />
                             <input value={customerToken} id={customerToken.email}
                             name={customerToken.email} onChange={handleChange} placeholder="Enter customer email" />
                             <input value={customerToken} id={customerToken.email}
                             name={customerToken.email} onChange={handleChange} placeholder="Enter customer email" /> */}
-                            <button type="submit">Proceed</button>
-                        </form>
+                            {/* <button type="submit">Proceed</button> */}
+                        {/* </form> */}
+                        <button onClick={genOrder}>Proceed</button>
                     </div>
                 )}
                 <div className="w-full">
