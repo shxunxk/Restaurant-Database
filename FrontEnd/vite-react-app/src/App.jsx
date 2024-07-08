@@ -30,10 +30,10 @@ function App() {
           <Route path="about" element={<About />} />
           <Route path="cart" element={<Cart />} />
         </Route>
+        <Route path="newOrder" element={<TakeOrder />} />
         <Route path="orders">
           {/* <Navbar/> */}
           <Route index element={<Orders />}/>
-          <Route path="newOrder" element={<TakeOrder />} />
           <Route path="orderItems/:id" element={<OrderItems />} />
         </Route>
         <Route path="bill">

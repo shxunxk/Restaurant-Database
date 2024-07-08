@@ -1,6 +1,6 @@
 const Order = require('../models/order');
 const Bill = require('../models/bill');
-const Customer = require('../models/customers');
+const {Customer} = require('../models/customers');
 const generateIntId = require('../generateId');
 
 const getOrder = async (req, res) => {

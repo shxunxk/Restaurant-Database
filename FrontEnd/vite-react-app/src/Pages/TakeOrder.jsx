@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 export default function TakeOrder() {
+
+    
+const user = JSON.parse(Cookies.get('user'));
+
+
     const options = new Set();
     const [data, setData] = useState([]);
     const [bill, setBill] = useState({});
     const [selectedItems, setSelectedItems] = useState([]);
-    const [customerToken, setCustomerToken] = useState({id:""});
+    const [customerToken, setCustomerToken] = useState(user?.dataValues);
 
     useEffect(() => {
         const getOrder = async () => {
@@ -47,10 +53,10 @@ export default function TakeOrder() {
     
     const genOrder = async () => {
         try {
-            const billId = bill[customerToken.id]||null;
+            const billId = bill[customerToken?.customer_id]||null;
             let response = await axios.post('http://localhost:3000/order', {
                 bill_id: billId,
-                customer_id: customerToken.id
+                customer_id: customerToken?.customer_id
             });
             console.log('Order placed successfully:', response.data);
             for (const item of selectedItems) {
@@ -91,7 +97,7 @@ export default function TakeOrder() {
                     return { ...item, quant: newQuant > 0 ? newQuant : 0 };
                 }
                 return item;
-            }).filter(item => item.quant > 0); // Remove item if quantity is zero
+            }).filter(item => item.quant > 0);
         });
     };
 

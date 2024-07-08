@@ -1,6 +1,8 @@
 import axios from 'axios'
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import Cookies from 'js-cookie';
+
 
 // import { auth, database } from '../Firebase.js'
 // import { createUserWithEmailAndPassword } from 'firebase/auth'
@@ -25,7 +27,8 @@ const handleLogin = (e) => {
     .then(response => {
       // Handle successful login response
       if(response.data.message === 'Login successful'){
-        window.location.href = '/orders/newOrder';
+        Cookies.set('user', JSON.stringify(response.data), { expires: 0.5 });
+        window.location.href = '/newOrder';
       }
       // console.log('Login successful', response.data);
     })
