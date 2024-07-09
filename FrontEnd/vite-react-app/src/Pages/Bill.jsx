@@ -100,7 +100,7 @@ export default function Bill() {
       {bill.map((item, index) => {
         let sum = 0;
         return (
-          (user?.dataValues?.customer_id === item.customer_id || user?.type === 'Employee') && (
+          (user?.user?.customer_id === item.customer_id || user?.type === 'Employee') && (
             <div className='flex flex-col items-center h-fit gap-10 py-20' key={index}>
               <div className="h-fit bg-white container rounded-xl border-2 border-solid border-black border-opacity-50 w-5/6 p-2 mx-auto sm:p-8" ref={(el) => (printRefs.current[index] = el)}>
                 <div className='flex flex-col mb-10 sm:flex-row'>

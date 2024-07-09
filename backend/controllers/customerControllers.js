@@ -36,6 +36,43 @@ const createCustomer = async (req, res) => {
   }
 };
 
+const updateCustomer = async (req, res) => {
+  const { customer_id } = req.params; // Assuming customer_id is passed as a parameter in the URL
+  const { updatedFields } = req.body; // Assuming updatedFields contains the fields to update
+
+  console.log(customer_id)
+  try {
+    // Check if customer_id is provided
+    if (!customer_id) {
+      return res.status(400).json({ error: 'Customer ID is required' });
+    }
+
+    // Find the customer by customer_id
+    let customer = await Customer.findOne({
+      where: { customer_id: customer_id }
+    });
+
+    // If customer not found, return error
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+
+    // Update the customer with the provided fields
+    await customer.update(updatedFields);
+
+    // Fetch the updated customer
+    customer = await Customer.findOne({
+      where: { customer_id: customer_id }
+    });
+
+    // Respond with the updated customer
+    res.status(200).json({...customer, password: null});
+  } catch (error) {
+    // Handle errors
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // const deleteMenuItem = async (req, res) => {
 //   try {
 
@@ -70,6 +107,7 @@ const createCustomer = async (req, res) => {
 
 module.exports = {
   getCustomer,
-  createCustomer
+  createCustomer,
+  updateCustomer
   //   deleteMenuItem,
 };

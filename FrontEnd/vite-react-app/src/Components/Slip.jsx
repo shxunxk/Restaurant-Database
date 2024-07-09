@@ -20,7 +20,6 @@ export default function Slip({data, category, status, button}) {
           order_id: data.order_id,
           status: newStatus
         });
-        console.log(response.data);
         // Optionally, you can update the local state or refetch data to reflect the status change
       }
 
@@ -105,7 +104,7 @@ export default function Slip({data, category, status, button}) {
         }
         return(
           <>
-          <Link to={`./orderItems/${data.order_id}`}>
+          <Link to={`/orderItems/${data.order_id}`}>
             <p key={index}>{field}: {data[item]||'NA'}</p>
           </Link>
           </>

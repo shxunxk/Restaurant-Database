@@ -104,10 +104,12 @@ const Sidebar = () => {
                 </>
               )}
             </ul>
-            <div className='flex items-center mt-auto'>
-              <img src={'vite.svg'} className='w-10 h-10 bg-gray-200 rounded-full' alt="Profile" />
-              <p className='ml-4'>My Account</p>
-            </div>
+            <Link to='/myAccount'>
+              <div className='flex items-center mt-auto'>
+                <img src={'vite.svg'} className='w-10 h-10 bg-gray-200 rounded-full' alt="Profile" />
+                <p className='ml-4'>My Account</p>
+              </div>
+            </Link>
           </div>
         </div>
       )}
