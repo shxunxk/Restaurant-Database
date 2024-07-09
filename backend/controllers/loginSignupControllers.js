@@ -3,22 +3,23 @@ const { Employee } = require('../models/employee');
 
 
 const login = async (req, res) => {
-  const { type,email, password } = req.body;
 
+  console.log(req.body)
+
+  const { mobile,email, password, type } = req.body;
 
   try {
     let user = null
+
     // Check if a customer with the provided email exists
-    if(type === 'Customer'){
-      user = await Customer.findOne({ where: { email: email } });
-    }else{
-      user = await Employee.findOne({ where: { email: email } });
+    if (type === 'Customer') {
+      user = await Customer.findOne({ where: { email } });
+    } else if (type === 'Employee') {
+      user = await Employee.findOne({ where: { email } });
     }
 
-    console.log(user)
-
     if (!user) {
-      return res.status(404).json({ message: 'Customer not found' });
+      return res.status(404).json({ message: `${type} not found` });
     }
 
     // Validate password
@@ -27,7 +28,8 @@ const login = async (req, res) => {
     }
 
     // Successful login
-    return res.status(200).json({ message: 'Login successful', ...user,type: type });
+    const { password: _, ...userWithoutPassword } = user.toJSON(); // Exclude password from the response
+    return res.status(200).json({ message: 'Login successful', user: userWithoutPassword, type });
   } catch (error) {
     console.error('Login error:', error);
     return res.status(500).json({ message: 'Internal server error' });
@@ -36,17 +38,16 @@ const login = async (req, res) => {
 
 
 const signup = async (req, res) => {
-  const { customer_name, email, mobile, address, password } = req.body;
+  const { username, email, mobile, password, type } = req.body;
 
   try {
     // Check if the email is already registered
     // Create new customer
     const newCustomer = await Customer.create({
-      customer_name,
-      email,
-      mobile,
-      address,
-      password
+      customer_name: username,
+      email: email,
+      mobile: mobile,
+      password: password
     });
 
     return res.status(201).json({ message: 'Customer created successfully', customer: newCustomer });

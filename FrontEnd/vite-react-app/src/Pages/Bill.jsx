@@ -1,10 +1,14 @@
 import axios from 'axios';
 import { useState, useEffect, useRef } from 'react';
+import Cookies from 'js-cookie';
+import { Link } from 'react-router-dom';
 
 export default function Bill() {
   const [bill, setBill] = useState([]);
   const [orderItems, setOrderItems] = useState({});
   const printRefs = useRef([]);
+
+  const user = JSON.parse(Cookies.get('user'));
 
   useEffect(() => {
     const fetchData = async () => {
@@ -14,7 +18,8 @@ export default function Bill() {
 
         const getCustomers = async (id) => {
           const customers = await axios.get('http://localhost:3000/customers', {
-            params:{customer_id: id}});
+            params: { customer_id: id }
+          });
           return customers.data;
         };
 
@@ -40,7 +45,7 @@ export default function Bill() {
 
         const fetchOrderItems = async (order_id) => {
           const response = await axios.get('http://localhost:3000/orderitems', {
-            params: { order_id },
+            params: { order_id }
           });
           return response.data;
         };
@@ -87,6 +92,7 @@ export default function Bill() {
     document.body.innerHTML = printContents;
     window.print();
     document.body.innerHTML = originalContents;
+    window.location.reload(); // Reload to restore the original page content after printing
   };
 
   return (
@@ -94,65 +100,67 @@ export default function Bill() {
       {bill.map((item, index) => {
         let sum = 0;
         return (
-          <div className='flex flex-col items-center p-4' key={index}>
-            <div className="my-24 bg-white container rounded-xl border-2 border-solid border-black border-opacity-50 w-5/6 p-2 mx-auto sm:p-8" ref={(el) => (printRefs.current[index] = el)}>
-              <div className='flex flex-col mb-10 sm:flex-row'>
-                <div className="flex-1">
-                  <p className="font-semibold">Bill Number: {item.bill_id}</p>
+          (user?.dataValues?.customer_id === item.customer_id || user?.type === 'Employee') && (
+            <div className='flex flex-col items-center h-fit gap-10 py-20' key={index}>
+              <div className="h-fit bg-white container rounded-xl border-2 border-solid border-black border-opacity-50 w-5/6 p-2 mx-auto sm:p-8" ref={(el) => (printRefs.current[index] = el)}>
+                <div className='flex flex-col mb-10 sm:flex-row'>
+                  <div className="flex-1">
+                    <p className="font-semibold">Bill Number: {item.bill_id}</p>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold">Date: {item.bill_date}</p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="font-semibold">Date: {item.bill_date}</p>
+
+                <div className="mb-20">
+                  <p className="font-semibold">Customer Name: {item.customer_name}</p>
                 </div>
-              </div>
 
-              <div className="mb-20">
-                <p className="font-semibold">Customer Name: {item.customer_name}</p>
-              </div>
-
-              <h3 className="text-lg font-bold mb-2">Items</h3>
-              <table className="w-full mb-4 text-xs lg:text-lg">
-                <thead>
-                  <tr>
-                    <th className="border sm:px-4 sm:py-2">No.</th>
-                    <th className="border sm:px-4 sm:py-2">Item</th>
-                    <th className="border sm:px-4 sm:py-2">Quantity</th>
-                    <th className="border sm:px-4 sm:py-2">Unit Price</th>
-                    <th className="border sm:px-4 sm:py-2">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orderItems[item.bill_id] ? (
-                    orderItems[item.bill_id].map((orderItem, index) => {
-                      const totalPrice = orderItem.price * orderItem.quantity;
-                      sum += totalPrice;
-                      return (
-                        <tr key={index}>
-                          <td className="border sm:px-4 sm:py-2">{index + 1}</td>
-                          <td className="border sm:px-4 sm:py-2">{orderItem.name}</td>
-                          <td className="border sm:px-4 sm:py-2">{orderItem.quantity}</td>
-                          <td className="border sm:px-4 sm:py-2">{orderItem.price}</td>
-                          <td className="border sm:px-4 sm:py-2">{totalPrice}</td>
-                        </tr>
-                      );
-                    })
-                  ) : (
+                <h3 className="text-lg font-bold mb-2">Items</h3>
+                <table className="w-full mb-4 text-xs lg:text-lg">
+                  <thead>
                     <tr>
-                      <td className="border px-4 py-2" colSpan="5">
-                        No items found
-                      </td>
+                      <th className="border sm:px-4 sm:py-2">No.</th>
+                      <th className="border sm:px-4 sm:py-2">Item</th>
+                      <th className="border sm:px-4 sm:py-2">Quantity</th>
+                      <th className="border sm:px-4 sm:py-2">Unit Price</th>
+                      <th className="border sm:px-4 sm:py-2">Total</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {orderItems[item.bill_id] ? (
+                      orderItems[item.bill_id].map((orderItem, index) => {
+                        const totalPrice = orderItem.price * orderItem.quantity;
+                        sum += totalPrice;
+                        return (
+                          <tr key={index}>
+                            <td className="border sm:px-4 sm:py-2">{index + 1}</td>
+                            <td className="border sm:px-4 sm:py-2">{orderItem.name}</td>
+                            <td className="border sm:px-4 sm:py-2">{orderItem.quantity}</td>
+                            <td className="border sm:px-4 sm:py-2">{orderItem.price}</td>
+                            <td className="border sm:px-4 sm:py-2">{totalPrice}</td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td className="border px-4 py-2" colSpan="5">
+                          No items found
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
 
-              <p className="font-bold">Grand Total: {sum}</p>
+                <p className="font-bold">Grand Total: {sum}</p>
 
-              <h3 className="text-xl font-bold mt-8 mb-2">Payment Details</h3>
-              <p><strong>Payment Status: </strong>{item.payment_status}</p>
-              {/* <p><strong>Payment Method: </strong> </p> */}
+                <h3 className="text-xl font-bold mt-8 mb-2">Payment Details</h3>
+                <p><strong>Payment Status: </strong>{item.payment_status}</p>
+              </div>
+              <Link to={'/payment'}>{user?.type === 'Customer' && <button className='px-6 py-3 bg-green-300 rounded-lg text-2xl w-fit self-center'>Pay</button>}</Link>
+              <button className='px-6 py-3 bg-green-300 rounded-lg text-2xl w-fit self-center' onClick={() => handlePrint(index)}>Print</button>
             </div>
-            <button className='px-6 py-3 mb-20 bg-green-300 rounded-lg text-2xl w-fit self-center' onClick={() => handlePrint(index)}>Print</button>
-          </div>
+          )
         );
       })}
     </>

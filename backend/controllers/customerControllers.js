@@ -1,7 +1,7 @@
-const Customer = require('../models/customers');
+const {Customer} = require('../models/customers');
 
 const getCustomer = async (req, res) => {
-  const {customer_id} = req.query
+  const {customer_id, type} = req.query
   try {
     let customer
     if(customer_id){

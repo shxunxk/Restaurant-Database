@@ -2,12 +2,12 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/config');
 
 const Employee = sequelize.define('Employee', {
-  customer_id: {
+  employee_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
-  customer_name: {
+  employee_name: {
     type: DataTypes.STRING,
     allowNull: false
   },

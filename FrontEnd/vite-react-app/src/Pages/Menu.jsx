@@ -164,7 +164,7 @@ export default function Home() {
 
   return (
     <div>
-      <div className='my-20 mx-4 sm:mx-16'>
+      <div className='py-20 mx-4 sm:mx-16'>
         <Options getType={getType} options={options} />
         <div>
           {card && (
