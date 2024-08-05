@@ -40,12 +40,12 @@ function App() {
             <Route path="bill" element={<Bill />} />
             <Route path="customers" element={<Customer />} />
             <Route path="userManagement" element={<UserManagement />} />
-          </>
-          }
-          {!user && <div className='flex flex-col gap-10 justify-center items-center h-screen'>
+            {!user && <div className='flex flex-col gap-10 justify-center items-center h-screen'>
               <h2 className='text-2xl'>Please Login</h2>
               <Link to='/'><button className='bg-blue-400 px-3 py-2 rounded-md text-white font-bold hover:bg-blue-700'>Login page</button></Link>
             </div>}
+          </>
+          }
         </Routes>
         
 

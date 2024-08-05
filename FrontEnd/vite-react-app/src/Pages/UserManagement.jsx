@@ -26,22 +26,24 @@ export default function UserManagement() {
     setSearchTerm(event.target.value);
   };
 
+  const filteredEmployees = emp.filter(employee =>
+    employee?.employee_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   if (loading) {
     return <div>Loading...</div>;
   }
 
   return (
     <>
-      <SearchBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
-      <div className='mt-20 mx-4 gap-2 grid grid-cols-1 md:grid-cols-2'>
-        {emp && emp.length > 0 ? (
-          emp
-            .filter(employee =>
-              employee?.employee_name?.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-            .map((item, index) => (
-              <Slip key={index} data={item} button={['View', 'Delete']} />
-            ))
+      <div className='mt-10 mx-4 sm:mx-16'>
+        <SearchBar searchTerm={searchTerm} onSearchChange={handleSearchChange} page={'Employee'}/>
+      </div>
+      <div className="mt-20 mx-4 sm:mx-16 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10">
+        {filteredEmployees.length > 0 ? (
+          filteredEmployees.map((item, index) => (
+            <Slip key={index} data={item} button={['View', 'Delete']} />
+          ))
         ) : (
           <div>No employees found.</div>
         )}

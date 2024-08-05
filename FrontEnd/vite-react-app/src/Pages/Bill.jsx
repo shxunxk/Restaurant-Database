@@ -7,20 +7,31 @@ export default function Bill() {
   const [bill, setBill] = useState([]);
   const [orderItems, setOrderItems] = useState({});
   const printRefs = useRef([]);
-
   const user = JSON.parse(Cookies.get('user'));
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const billResponse = await axios.get('http://localhost:3000/bill');
+        
+        const orderResponse = await axios.get('http://localhost:3000/order');
+        
+        const menuResponse = await axios.get('http://localhost:3000/menu');
+
         const bills = billResponse.data;
+        const orders = orderResponse.data;
+        const menuItems = menuResponse.data;
 
         const getCustomers = async (id) => {
-          const customers = await axios.get('http://localhost:3000/customers', {
-            params: { customer_id: id }
-          });
-          return customers.data;
+          try {
+            const customers = await axios.get('http://localhost:3000/customerEmployee/customer', {
+              params: { customer_id: id }
+            });
+            return customers.data;
+          } catch (error) {
+            console.error(`Error fetching customer with id ${id}:`, error);
+            throw error;
+          }
         };
 
         const updatedBills = await Promise.all(
@@ -32,53 +43,46 @@ export default function Bill() {
 
         setBill(updatedBills);
 
-        const orderResponse = await axios.get('http://localhost:3000/order');
-        const fetchedOrders = orderResponse.data;
-
-        let sortedOrders = {};
-        fetchedOrders.forEach((item) => {
-          if (!sortedOrders[item.bill_id]) {
-            sortedOrders[item.bill_id] = [];
+        const sortedOrders = orders.reduce((acc, item) => {
+          if (!acc[item.bill_id]) {
+            acc[item.bill_id] = [];
           }
-          sortedOrders[item.bill_id].push(item);
-        });
+          acc[item.bill_id].push(item);
+          return acc;
+        }, {});
 
         const fetchOrderItems = async (order_id) => {
-          const response = await axios.get('http://localhost:3000/orderitems', {
-            params: { order_id }
-          });
-          return response.data;
+          try {
+            const response = await axios.get('http://localhost:3000/orderitems', {
+              params: { order_id }
+            });
+            return response.data;
+          } catch (error) {
+            console.error(`Error fetching order items for order_id ${order_id}:`, error);
+            throw error;
+          }
         };
-
-        const menuResponse = await axios.get('http://localhost:3000/menu');
-        const menuItems = menuResponse.data;
 
         const allOrderItems = {};
 
-        for (const bill_id of Object.keys(sortedOrders)) {
-          const billOrders = sortedOrders[bill_id];
-          for (const order of billOrders) {
+        for (const bill_id in sortedOrders) {
+          for (const order of sortedOrders[bill_id]) {
             const items = await fetchOrderItems(order.order_id);
             if (!allOrderItems[bill_id]) {
               allOrderItems[bill_id] = [];
             }
-            items.forEach(item => {
-              const existingItem = allOrderItems[bill_id].find(i => {
-                return(
-                  i.item_id === item.item_id
-                ) 
-              });
-              if (!existingItem) {
-                allOrderItems[bill_id].push(item);
+            items.forEach((item) => {
+              const existingItem = allOrderItems[bill_id].find(i => i.item_id === item.item_id);
+              if (existingItem) {
+                existingItem.quantity += item.quantity;
               } else {
-                existingItem.quantity = existingItem.quantity + item.quantity;
+                allOrderItems[bill_id].push(item);
               }
             });
           }
         }
-        
 
-        for (const bill_id of Object.keys(allOrderItems)) {
+        for (const bill_id in allOrderItems) {
           allOrderItems[bill_id] = allOrderItems[bill_id].map(item => {
             const menuItem = menuItems.find(menuItem => menuItem.item_id === item.item_id);
             if (menuItem) {
@@ -100,25 +104,23 @@ export default function Bill() {
   const handlePrint = (index) => {
     const printContent = printRefs.current[index];
     const originalContents = document.body.innerHTML;
-    const printContents = printContent.innerHTML;
-    document.body.innerHTML = printContents;
+    document.body.innerHTML = printContent.innerHTML;
     window.print();
     document.body.innerHTML = originalContents;
-    window.location.reload(); // Reload to restore the original page content after printing
+    window.location.reload();
   };
 
-  const handlePayment = (item) => {
-    axios.put('http://localhost:3000/bill', {
-      bill_id: item.bill_id,
-      status: item.payment_status === 'Not Paid'? 'Paid': 'Not Paid'
-    })
-    .then(
-      response => {
-        console.log(response.data)
-      }
-    ).catch(error => {
-      console.error(error)
-    })
+  const handlePayment = async (item) => {
+    try {
+      const response = await axios.put('http://localhost:3000/bill', {
+        bill_id: item.bill_id,
+        status: item.payment_status === 'Not Paid' ? 'Paid' : 'Not Paid'
+      });
+      console.log('Payment update response:', response);
+      // Optionally update the UI or fetch the updated bill data here
+    } catch (error) {
+      console.error('Error updating payment status:', error);
+    }
   };
 
   return (
@@ -137,11 +139,9 @@ export default function Bill() {
                     <p className="font-semibold">Date: {item.bill_date}</p>
                   </div>
                 </div>
-
                 <div className="mb-20">
                   <p className="font-semibold">Customer Name: {item.customer_name}</p>
                 </div>
-
                 <h3 className="text-lg font-bold mb-2">Items</h3>
                 <table className="w-full mb-4 text-xs lg:text-lg">
                   <thead>
@@ -155,12 +155,12 @@ export default function Bill() {
                   </thead>
                   <tbody>
                     {orderItems[item.bill_id] ? (
-                      orderItems[item.bill_id].map((orderItem, index) => {
+                      orderItems[item.bill_id].map((orderItem, idx) => {
                         const totalPrice = orderItem.price * orderItem.quantity;
                         sum += totalPrice;
                         return (
-                          <tr key={index}>
-                            <td className="border sm:px-4 sm:py-2">{index + 1}</td>
+                          <tr key={idx}>
+                            <td className="border sm:px-4 sm:py-2">{idx + 1}</td>
                             <td className="border sm:px-4 sm:py-2">{orderItem.name}</td>
                             <td className="border sm:px-4 sm:py-2">{orderItem.quantity}</td>
                             <td className="border sm:px-4 sm:py-2">{orderItem.price}</td>
@@ -170,20 +170,18 @@ export default function Bill() {
                       })
                     ) : (
                       <tr>
-                        <td className="border px-4 py-2" colSpan="5">
-                          No items found
-                        </td>
+                        <td className="border px-4 py-2" colSpan="5">No items found</td>
                       </tr>
                     )}
                   </tbody>
                 </table>
-
                 <p className="font-bold">Grand Total: {sum}</p>
-
                 <h3 className="text-xl font-bold mt-8 mb-2">Payment Details</h3>
                 <p><strong>Payment Status: </strong>{item.payment_status}</p>
               </div>
-              <Link to={'/payment'}>{user?.type === 'Customer' && <button className='px-6 py-3 bg-green-300 rounded-lg text-2xl w-fit self-center'>Pay</button>}</Link>
+              <Link to={'/payment'}>
+                {user?.type === 'Customer' && <button className='px-6 py-3 bg-green-300 rounded-lg text-2xl w-fit self-center'>Pay</button>}
+              </Link>
               {user?.type === 'Employee' && <button className='px-6 py-3 bg-green-300 rounded-lg text-2xl w-fit self-center' onClick={() => handlePayment(item)}>Set Paid</button>}
               <button className='px-6 py-3 bg-green-300 rounded-lg text-2xl w-fit self-center' onClick={() => handlePrint(index)}>Print</button>
             </div>

@@ -96,9 +96,9 @@ const Sidebar = () => {
                   <Link to='/orders'><li key="orders" className="hover:text-blue-600">
                     Orders
                   </li></Link>
-                  <Link to='/newOrder'><li key="place-order-employee" className="hover:text-blue-600">
+                  {/* <Link to='/newOrder'><li key="place-order-employee" className="hover:text-blue-600">
                     Place Order
-                  </li></Link>
+                  </li></Link> */}
                   <Link to='/bill'><li key="bills" className="hover:text-blue-600">
                     Bills
                   </li></Link>
