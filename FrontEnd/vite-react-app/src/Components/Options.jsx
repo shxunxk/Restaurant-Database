@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 export default function Options({getType, options}) {
 
@@ -8,8 +8,13 @@ export default function Options({getType, options}) {
     const [selected, setSelected] = useState(0)
 
     useMemo(()=>{
-      getType(options[selected])
-    },[selected, getType])
+      getType([...options][selected])
+    },[selected])
+
+    useEffect(()=>{
+      console.log('hi')
+      getType([...options][0])
+    },[])
 
     const changeStyle = (index) => {
       setSelected(index)

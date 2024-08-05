@@ -59,6 +59,7 @@ export default function Orders() {
           <h1 className="font-bold text-3xl">{item1}</h1>
           <div className="my-10 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-5">
             {data && data.length > 0 && data.filter((temp)=>(temp.order_status === item1)).map((item, index) => (
+                  
                   <Slip key={index} data={item} category={item1} status={status} button={['Proceed', 'Back']} />
             ))}
           </div>

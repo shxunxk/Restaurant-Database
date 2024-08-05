@@ -1,18 +1,40 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { useParams } from 'react-router-dom';
 
 export default function Account() {
   const user = JSON.parse(Cookies.get('user'));
 
+  // const {id} = useParams()
+
+  // console.log(id)
+
+  console.log(user)
   const [userInfo, setUserInfo] = useState({
     customer_id: user?.user?.customer_id,
-    name: user?.user?.customer_name,
+    employee_id: user?.user?.employee_id,
+    name: user?.user?.customer_name||user?.user?.employee_name,
     email: user?.user?.email,
     phone: user?.user?.mobile,
     address: user?.user?.address,
+    position: user?.user?.employee_position,
     img: user?.user?.img||'https://imgs.search.brave.com/5juHS53Y4trr3LQKd1FtB45PY5vMe8yQFzi_g-MQIT0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/dmVjdG9yc3RvY2su/Y29tL2kvNTAwcC81/NS82Ny9uby1pbWFn/ZS1hdmFpbGFibGUt/cGljdHVyZS12ZWN0/b3ItMzE1OTU1Njcu/anBn'
   });
+
+  // useEffect(()=>{
+  //   axios.get('http://localhost:3000/customerEmployee/customer',{
+  //     params: { customer_id: id }
+  //   })
+  //     .then(response => {
+  //       setUserInfo(response.data);
+  //     })
+  //     .catch(error => {
+  //       console.error('There was an error!', error);
+  //     });
+  // },[id])
+
+  console.log(userInfo)
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -26,8 +48,13 @@ export default function Account() {
 
   const handleSave = async () => {
     try {
-      const response = await axios.put(`http://localhost:3000/customers/${userInfo.customer_id}`, userInfo);
-      console.log('User information updated:', response.data);
+      if(user?.type === 'Customer'){
+        const response = await axios.put(`http://localhost:3000/customerEmployee/customer/${userInfo.customer_id}`, userInfo);
+        console.log('User information updated:', response.data);
+      }else{
+        const response = await axios.put(`http://localhost:3000/customerEmployee/employee/${userInfo.employee_id}`, userInfo);
+        console.log('User information updated:', response.data);
+      }
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating user information:', error);
@@ -87,7 +114,7 @@ export default function Account() {
           )}
         </div>
 
-        <div className="mb-4">
+        {user?.type === 'Customer' && <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">Address</label>
           {isEditing ? (
             <input
@@ -100,7 +127,22 @@ export default function Account() {
           ) : (
             <p className="mt-1">{userInfo.address}</p>
           )}
-        </div>
+        </div>}
+
+        {user?.type === 'Employee' && <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">Position</label>
+          {isEditing ? (
+            <input
+              type="text"
+              name="address"
+              value={userInfo.position}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            />
+          ) : (
+            <p className="mt-1">{userInfo.address}</p>
+          )}
+        </div>}
 
         <div className="flex justify-end">
           {isEditing ? (

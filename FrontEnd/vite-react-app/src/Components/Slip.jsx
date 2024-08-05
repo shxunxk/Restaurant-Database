@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 // eslint-disable-next-line react/prop-types
 export default function Slip({data, category, status, button}) {
 
+  // console.log(data)
   const changeStatus = async () => {
     try {
       let newStatus;
@@ -65,22 +66,24 @@ export default function Slip({data, category, status, button}) {
     }
   };
 
+
   if (category !== data.order_status) {
     return null;
   }
 
 
   return (
-    (category === data['order_status']) &&
-    <div className="text-left border border-gray-400 rounded-md p-4">
+    (category === data['order_status'] && data?.employee_position !== 'Manager') &&
+    <div className="text-left border border-gray-400 rounded-md p-4 flex flex-col justify-between">
+      <Link to={data.order_id?`/orderItems/${data.order_id}`:`/myAccount/${data.customer_id}`}>
       {Object.keys(data).map((item,index)=>{
         let field = null
-        if(item === 'customer_id'){
-          field = 'Customer ID'
+        if(item === 'customer_id'||item === 'employee_id'){
+          field = 'ID'
         }else if(item === 'order_id'){
           field = 'Order ID'
         }
-        else if(item === 'customer_name'){
+        else if(item === 'customer_name'||item === 'employee_name'){
           field = 'Name'
         }else if(item === 'email'){
           field = 'Email'
@@ -101,18 +104,20 @@ export default function Slip({data, category, status, button}) {
         }
         else if(item === 'order_date'){
           field = 'Date'
+        }else if(item === 'employee_position'){
+          field = 'Position'
         }
+      
         return(
           <>
-          <Link to={`/orderItems/${data.order_id}`}>
-            <p key={index}>{field}: {data[item]||'NA'}</p>
-          </Link>
+            <p key={index} className='overflow-clip'>{`${field}: ${data[item]||'NA'}`}</p>
           </>
         ) 
         })}
+      </Link>
       <div className='flex justify-end mt-4 gap-2 z-1'>
-      <button className="bg-green-300 py-1 px-2 rounded-md z-2" onClick={()=>changeStatus()}>{button[0]}</button>
-      <button className="bg-red-300 py-1 px-2 rounded-md z-2" onClick={()=>backStatus()}>{button[1]}</button>
+      {button[0] && <button className="bg-green-300 py-1 px-2 rounded-md z-2" onClick={()=>changeStatus()}>{button[0]}</button>}
+      {button[1] && <button className="bg-red-300 py-1 px-2 rounded-md z-2" onClick={()=>backStatus()}>{button[1]}</button>}
       </div>
     </div>
   )

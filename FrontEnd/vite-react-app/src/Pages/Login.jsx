@@ -4,6 +4,11 @@ import { Link, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
 export default function Login({ text, but }) {
+
+  useEffect(() => {
+    Cookies.remove('user');
+  }, []);
+
   const [formData, setFormData] = useState({});
   const { type } = useParams();
 
@@ -57,12 +62,15 @@ export default function Login({ text, but }) {
             {but === 'Sign In' && <label className='my-2'>
               <input type="name" name="username" value={formData.username || ''} onChange={handleChange} className='rounded-md shadow-lg p-2 border border-solid border-black border-opacity-10' style={{ width: '300px' }} placeholder={'Enter Name'} />
             </label>}
-            <label className='my-2'>
+            {but === 'Log In' && <label className='my-2'>
+              <input type="id" name="id" value={formData.id || ''} onChange={handleChange} className='rounded-md shadow-lg p-2 border border-solid border-black border-opacity-10' style={{ width: '300px' }} placeholder={'Enter Mobile No. or Email'} />
+            </label>}
+            {but === 'Sign In' && <label className='my-2'>
               <input type="mobile" name="mobile" value={formData.mobile || ''} onChange={handleChange} className="rounded-md shadow-lg p-2 border border-solid border-black border-opacity-10" style={{ width: '300px' }} placeholder={'Enter Phone Number'} />
-            </label>
-            <label className='my-2'>
+            </label>}
+            {but === 'Sign In' && <label className='my-2'>
               <input type="email" name="email" value={formData.email || ''} onChange={handleChange} className='rounded-md shadow-lg p-2 border border-solid border-black border-opacity-10' style={{ width: '300px' }} placeholder={'Enter Email'} />
-            </label>
+            </label>}
             <label className='my-2'>
               <input type="password" name="password" value={formData.password || ''} onChange={handleChange} className="rounded-md shadow-lg p-2 border border-solid border-black border-opacity-10" style={{ width: '300px' }} placeholder={'Enter Password'} />
             </label>

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
 const Sidebar = () => {
-  const [userType, setUserType] = useState(null);
+  const [user, setUser] = useState(null);
   const [cond, setCond] = useState(false);
 
   useEffect(() => {
@@ -11,12 +11,13 @@ const Sidebar = () => {
     if (userCookie) {
       try {
         const user = JSON.parse(userCookie);
-        setUserType(user.type);
+        setUser(user);
       } catch (error) {
         console.error('Failed to parse user cookie:', error);
       }
     }
   }, []);
+
 
   return  (
     <div
@@ -69,9 +70,9 @@ const Sidebar = () => {
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </div>
-          <div className='flex flex-col h-full text-gray-700 p-4'>
+          <div className='flex flex-col h-full text-gray-700 p-4 justify-between'>
             <ul className="flex flex-col space-y-4">
-              {userType === 'Customer' && (
+              {user?.type === 'Customer' && (
                 <>
                   <Link to='/orders'><li key="my-orders" className="hover:text-blue-600">
                     My Orders
@@ -84,7 +85,7 @@ const Sidebar = () => {
                   </li></Link>
                 </>
               )}
-              {userType === 'Employee' && (
+              {user?.type === 'Employee' && (
                 <>
                   <Link to='/menu'><li key="menu" className="hover:text-blue-600">
                     Menu
@@ -101,6 +102,9 @@ const Sidebar = () => {
                   <Link to='/bill'><li key="bills" className="hover:text-blue-600">
                     Bills
                   </li></Link>
+                  {user?.user?.employee_position === "Manager" && <Link to='/userManagement'><li key="userManagement" className="hover:text-blue-600">
+                    User Management
+                  </li></Link>}
                 </>
               )}
             </ul>

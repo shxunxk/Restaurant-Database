@@ -35,6 +35,31 @@ const createBill = async (req, res) => {
   }
 };
 
+const updateStatus = async (req, res) => {
+  const { bill_id, status } = req.body;
+
+  console.log(req.body)
+
+  if (!bill_id || !status) {
+    return res.status(400).json({ error: 'order_id and status are required' });
+  }
+
+  try {
+    const bill = await Bill.findByPk(bill_id);
+    if (!bill) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    bill.payment_status = status;
+    await bill.save();
+
+    res.status(200).json({ message: 'Order status updated successfully', bill });
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 // const deleteMenuItem = async (req, res) => {
 //   try {
 
@@ -69,6 +94,7 @@ const createBill = async (req, res) => {
 
 module.exports = {
   getBill,
-  createBill
+  createBill,
+  updateStatus
   //   deleteMenuItem,
 };

@@ -12,6 +12,7 @@ export default function Home() {
   const [type, setType] = useState();
   const [showNewItemForm, setShowNewItemForm] = useState(false);
   const [food, setFood] = useState([]);
+  const [currentMenu, setCurrentMenu] = useState()
   const [card, setCard] = useState(false);
   const [cardItem, setCardItem] = useState({});
 
@@ -35,29 +36,34 @@ export default function Home() {
   });
 
   const getMenu = () =>{
-    axios.get('http://localhost:3000/menu', {
-      params: { type: type }
-    })
+    axios.get('http://localhost:3000/menu')
       .then(response => {
         console.log(response.data)
         setFood(response.data);
+        response.data?.map((item)=>{
+          options.add(item?.item_type)
+          setType([...options][0])
+          setCurrentMenu(response.data.filter((item)=>(
+            item.item_type === [...options][0]
+          )))
+        })
       })
       .catch(error => {
         console.error('Error:', error);
       });
   }
 
+  useEffect(()=>{
+    getMenu()
+  },[])
   
-  food.map((item)=>{
-    options.add(item?.item_type)
-    if(options.length === 1){
-      setType(item?.item_type)
-    }
-  })
- 
 
   useEffect(() => {
-    getMenu()
+    setCurrentMenu(
+      food.filter((item)=>(
+        item.item_type === type
+      ))
+    )
     setCard(false)
     setNewItem({
       item_name: '',
@@ -213,7 +219,7 @@ export default function Home() {
           )}
         </div>
         <div className='grid gap-12 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8'>
-          {food.map((item) => (
+          {currentMenu?.map((item) => (
             <div className='mt-10 justify-between' key={item.id} onClick={() => showCard(true, item)}>
               <FoodCard items={item} />
             </div>

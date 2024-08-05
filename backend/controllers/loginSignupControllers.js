@@ -1,3 +1,4 @@
+const { Sequelize } = require('sequelize');
 const { Customer } = require('../models/customers');
 const { Employee } = require('../models/employee');
 
@@ -6,18 +7,31 @@ const login = async (req, res) => {
 
   console.log(req.body)
 
-  const { mobile,email, password, type } = req.body;
+  const { id, password, type } = req.body;
 
   try {
     let user = null
 
     // Check if a customer with the provided email exists
     if (type === 'Customer') {
-      user = await Customer.findOne({ where: { email } });
+    user = await Customer.findOne({ 
+        where: { 
+            [Sequelize.Op.or]: [
+                { email: id },
+                { mobile: id }
+            ]
+        }
+    });
     } else if (type === 'Employee') {
-      user = await Employee.findOne({ where: { email } });
+        user = await Employee.findOne({ 
+            where: { 
+                [Sequelize.Op.or]: [
+                    { email: id },
+                    { mobile: id }
+                ]
+            }
+        });
     }
-
     if (!user) {
       return res.status(404).json({ message: `${type} not found` });
     }
@@ -50,7 +64,7 @@ const signup = async (req, res) => {
       password: password
     });
 
-    return res.status(201).json({ message: 'Customer created successfully', customer: newCustomer });
+    return res.status(201).json({ message: 'Customer created successfully', customer: {...newCustomer, password:''} });
   } catch (error) {
     console.error('Sign up error:', error);
     return res.status(500).json({ message: 'Internal server error' });

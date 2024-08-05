@@ -1,11 +1,10 @@
 const Menu = require('../models/menu');
 
 const getMenu = async (req, res) => {
-  const {type} = req.query
+  const {type} = req.body
   try {
     let menuItems
     if(!type){
-      // console.log(type)
       menuItems = await Menu.findAll();
     }else{
       menuItems = await Menu.findAll({

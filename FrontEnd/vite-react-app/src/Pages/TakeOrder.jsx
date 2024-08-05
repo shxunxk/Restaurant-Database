@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import FoodCard from "../Components/FoodCard";
+import SearchBar from "../Components/SearchBar";
 
 export default function TakeOrder() {
 
@@ -17,6 +18,11 @@ const user = JSON.parse(Cookies.get('user'));
 
 
     const [prop, setProp] = useState(null)
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const handleSearchChange = (event) => {
+        setSearchTerm(event.target.value);
+      };
 
     useEffect(() => {
         const getOrder = async () => {
@@ -131,8 +137,7 @@ const user = JSON.parse(Cookies.get('user'));
                         </table>
                         {user?.type === 'Employee' && <form className="flex">
                             <p>Email or Phone:</p>
-                            <input value={prop} id={'prop'}
-                            name={'prop'} onChange={(e)=>{setProp(e.target.value)}} className="h-fit" placeholder="Enter" />
+                            <SearchBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
                         </form>}
                         <div className="w-full justify-center">
                             <button className="w-fit" onClick={genOrder}>Proceed</button>

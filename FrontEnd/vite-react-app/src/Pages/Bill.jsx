@@ -62,9 +62,21 @@ export default function Bill() {
             if (!allOrderItems[bill_id]) {
               allOrderItems[bill_id] = [];
             }
-            allOrderItems[bill_id].push(...items);
+            items.forEach(item => {
+              const existingItem = allOrderItems[bill_id].find(i => {
+                return(
+                  i.item_id === item.item_id
+                ) 
+              });
+              if (!existingItem) {
+                allOrderItems[bill_id].push(item);
+              } else {
+                existingItem.quantity = existingItem.quantity + item.quantity;
+              }
+            });
           }
         }
+        
 
         for (const bill_id of Object.keys(allOrderItems)) {
           allOrderItems[bill_id] = allOrderItems[bill_id].map(item => {
@@ -93,6 +105,20 @@ export default function Bill() {
     window.print();
     document.body.innerHTML = originalContents;
     window.location.reload(); // Reload to restore the original page content after printing
+  };
+
+  const handlePayment = (item) => {
+    axios.put('http://localhost:3000/bill', {
+      bill_id: item.bill_id,
+      status: item.payment_status === 'Not Paid'? 'Paid': 'Not Paid'
+    })
+    .then(
+      response => {
+        console.log(response.data)
+      }
+    ).catch(error => {
+      console.error(error)
+    })
   };
 
   return (
@@ -158,6 +184,7 @@ export default function Bill() {
                 <p><strong>Payment Status: </strong>{item.payment_status}</p>
               </div>
               <Link to={'/payment'}>{user?.type === 'Customer' && <button className='px-6 py-3 bg-green-300 rounded-lg text-2xl w-fit self-center'>Pay</button>}</Link>
+              {user?.type === 'Employee' && <button className='px-6 py-3 bg-green-300 rounded-lg text-2xl w-fit self-center' onClick={() => handlePayment(item)}>Set Paid</button>}
               <button className='px-6 py-3 bg-green-300 rounded-lg text-2xl w-fit self-center' onClick={() => handlePrint(index)}>Print</button>
             </div>
           )
