@@ -13,18 +13,16 @@ export default function Orders() {
 
   const status = ['Pending', 'In Progress', 'Complete'];
 
+  console.log(user)
   useEffect(() => {
     if (user?.type === 'Customer') {
-      // Fetch bills for the customer
       axios.get('http://localhost:3000/bill')
         .then(response => {
           const customerBills = response.data.filter(item => (
             item.customer_id === user.user.customer_id
           ));
           if (customerBills.length > 0) {
-            // Set bills state with customer's bills
             setBill(customerBills);
-            // Fetch orders related to the first bill (assuming chronological order)
             axios.get('http://localhost:3000/order')
               .then(orderResponse => {
                 setData(orderResponse.data.filter(item=> (
@@ -40,7 +38,6 @@ export default function Orders() {
           console.error('Error fetching bills:', error);
         });
     } else {
-      // For other types of users, fetch all orders
       axios.get('http://localhost:3000/order')
         .then(response => {
           setData(response.data);
@@ -49,7 +46,7 @@ export default function Orders() {
           console.error('Error fetching orders:', error);
         });
     }
-  }, []); // Ensure useEffect runs when user object changes
+  }, []);
   
 
   return (
@@ -60,7 +57,7 @@ export default function Orders() {
           <div className="my-10 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-5">
             {data && data.length > 0 && data.filter((temp)=>(temp.order_status === item1)).map((item, index) => (
                   
-                  <Slip key={index} data={item} category={item1} status={status} button={['Proceed', 'Back']} />
+                  <Slip key={index} data={item} category={item1} user={user} status={status} button={['Proceed', 'Back']} />
             ))}
           </div>
         </div>
@@ -77,7 +74,7 @@ export default function Orders() {
             <h1 className="font-bold text-3xl">Served</h1>
             <div className="my-10 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-5">
               {data && data.length > 0 && data.filter((temp)=>{return(temp.order_status === 'Served')}).map((item, index) => (
-                    <Slip key={index} data={item} category={'Served'} status={status} button={['Proceed', 'Back']} />
+                    <Slip key={index} data={item} user={user} category={'Served'} status={status} button={['Proceed', 'Back']} />
               ))}
             </div>
           </div>}

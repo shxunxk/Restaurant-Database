@@ -9,95 +9,95 @@ export default function Bill() {
   const printRefs = useRef([]);
   const user = JSON.parse(Cookies.get('user'));
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const billResponse = await axios.get('http://localhost:3000/bill');
-        
-        const orderResponse = await axios.get('http://localhost:3000/order');
-        
-        const menuResponse = await axios.get('http://localhost:3000/menu');
+  const fetchData = async () => {
+    try {
+      const billResponse = await axios.get('http://localhost:3000/bill');
+      
+      const orderResponse = await axios.get('http://localhost:3000/order');
+      
+      const menuResponse = await axios.get('http://localhost:3000/menu');
 
-        const bills = billResponse.data;
-        const orders = orderResponse.data;
-        const menuItems = menuResponse.data;
+      const bills = billResponse.data;
+      const orders = orderResponse.data;
+      const menuItems = menuResponse.data;
 
-        const getCustomers = async (id) => {
-          try {
-            const customers = await axios.get('http://localhost:3000/customerEmployee/customer', {
-              params: { customer_id: id }
-            });
-            return customers.data;
-          } catch (error) {
-            console.error(`Error fetching customer with id ${id}:`, error);
-            throw error;
-          }
-        };
-
-        const updatedBills = await Promise.all(
-          bills.map(async (item) => {
-            const person = await getCustomers(item.customer_id);
-            return { ...item, customer_name: person[0].customer_name };
-          })
-        );
-
-        setBill(updatedBills);
-
-        const sortedOrders = orders.reduce((acc, item) => {
-          if (!acc[item.bill_id]) {
-            acc[item.bill_id] = [];
-          }
-          acc[item.bill_id].push(item);
-          return acc;
-        }, {});
-
-        const fetchOrderItems = async (order_id) => {
-          try {
-            const response = await axios.get('http://localhost:3000/orderitems', {
-              params: { order_id }
-            });
-            return response.data;
-          } catch (error) {
-            console.error(`Error fetching order items for order_id ${order_id}:`, error);
-            throw error;
-          }
-        };
-
-        const allOrderItems = {};
-
-        for (const bill_id in sortedOrders) {
-          for (const order of sortedOrders[bill_id]) {
-            const items = await fetchOrderItems(order.order_id);
-            if (!allOrderItems[bill_id]) {
-              allOrderItems[bill_id] = [];
-            }
-            items.forEach((item) => {
-              const existingItem = allOrderItems[bill_id].find(i => i.item_id === item.item_id);
-              if (existingItem) {
-                existingItem.quantity += item.quantity;
-              } else {
-                allOrderItems[bill_id].push(item);
-              }
-            });
-          }
+      const getCustomers = async (id) => {
+        try {
+          const customers = await axios.get('http://localhost:3000/customerEmployee/customer', {
+            params: { customer_id: id }
+          });
+          return customers.data;
+        } catch (error) {
+          console.error(`Error fetching customer with id ${id}:`, error);
+          throw error;
         }
+      };
 
-        for (const bill_id in allOrderItems) {
-          allOrderItems[bill_id] = allOrderItems[bill_id].map(item => {
-            const menuItem = menuItems.find(menuItem => menuItem.item_id === item.item_id);
-            if (menuItem) {
-              return { ...item, price: menuItem.price, name: menuItem.item_name };
+      const updatedBills = await Promise.all(
+        bills.map(async (item) => {
+          const person = await getCustomers(item.customer_id);
+          return { ...item, customer_name: person[0].customer_name };
+        })
+      );
+
+      setBill(updatedBills);
+
+      const sortedOrders = orders.reduce((acc, item) => {
+        if (!acc[item.bill_id]) {
+          acc[item.bill_id] = [];
+        }
+        acc[item.bill_id].push(item);
+        return acc;
+      }, {});
+
+      const fetchOrderItems = async (order_id) => {
+        try {
+          const response = await axios.get('http://localhost:3000/orderitems', {
+            params: { order_id }
+          });
+          return response.data;
+        } catch (error) {
+          console.error(`Error fetching order items for order_id ${order_id}:`, error);
+          throw error;
+        }
+      };
+
+      const allOrderItems = {};
+
+      for (const bill_id in sortedOrders) {
+        for (const order of sortedOrders[bill_id]) {
+          const items = await fetchOrderItems(order.order_id);
+          if (!allOrderItems[bill_id]) {
+            allOrderItems[bill_id] = [];
+          }
+          items.forEach((item) => {
+            const existingItem = allOrderItems[bill_id].find(i => i.item_id === item.item_id);
+            if (existingItem) {
+              existingItem.quantity += item.quantity;
+            } else {
+              allOrderItems[bill_id].push(item);
             }
-            return item;
           });
         }
-
-        setOrderItems(allOrderItems);
-      } catch (error) {
-        console.error('Error fetching data:', error);
       }
-    };
 
+      for (const bill_id in allOrderItems) {
+        allOrderItems[bill_id] = allOrderItems[bill_id].map(item => {
+          const menuItem = menuItems.find(menuItem => menuItem.item_id === item.item_id);
+          if (menuItem) {
+            return { ...item, price: menuItem.price, name: menuItem.item_name };
+          }
+          return item;
+        });
+      }
+
+      setOrderItems(allOrderItems);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -112,12 +112,13 @@ export default function Bill() {
 
   const handlePayment = async (item) => {
     try {
+      console.log(item)
       const response = await axios.put('http://localhost:3000/bill', {
         bill_id: item.bill_id,
         status: item.payment_status === 'Not Paid' ? 'Paid' : 'Not Paid'
       });
       console.log('Payment update response:', response);
-      // Optionally update the UI or fetch the updated bill data here
+      fetchData()
     } catch (error) {
       console.error('Error updating payment status:', error);
     }
@@ -179,9 +180,9 @@ export default function Bill() {
                 <h3 className="text-xl font-bold mt-8 mb-2">Payment Details</h3>
                 <p><strong>Payment Status: </strong>{item.payment_status}</p>
               </div>
-              <Link to={'/payment'}>
-                {user?.type === 'Customer' && <button className='px-6 py-3 bg-green-300 rounded-lg text-2xl w-fit self-center'>Pay</button>}
-              </Link>
+              {/* <Link to={'/payment'}> */}
+                {user?.type === 'Customer' && <button className='px-6 py-3 bg-green-300 rounded-lg text-2xl w-fit self-center' onClick={() => handlePayment(item)}>Pay</button>}
+              {/* </Link> */}
               {user?.type === 'Employee' && <button className='px-6 py-3 bg-green-300 rounded-lg text-2xl w-fit self-center' onClick={() => handlePayment(item)}>Set Paid</button>}
               <button className='px-6 py-3 bg-green-300 rounded-lg text-2xl w-fit self-center' onClick={() => handlePrint(index)}>Print</button>
             </div>

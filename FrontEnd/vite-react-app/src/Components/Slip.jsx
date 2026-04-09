@@ -5,7 +5,7 @@ import axios from 'axios'
 import { Link } from 'react-router-dom';
 
 // eslint-disable-next-line react/prop-types
-export default function Slip({data, category, status, button}) {
+export default function Slip({data, category, user, status, button}) {
 
   // console.log(data)
   const changeStatus = async () => {
@@ -71,6 +71,7 @@ export default function Slip({data, category, status, button}) {
     return null;
   }
 
+  console.log(user)
 
   return (
     (category === data['order_status'] && data?.employee_position !== 'Manager') &&
@@ -115,10 +116,10 @@ export default function Slip({data, category, status, button}) {
         ) 
         })}
       </Link>
-      <div className='flex justify-end mt-4 gap-2 z-1'>
+      {user?.type === 'Employee' && (<div className='flex justify-end mt-4 gap-2 z-1'>
       {button[0] && <button className="bg-green-300 py-1 px-2 rounded-md z-2" onClick={()=>changeStatus()}>{button[0]}</button>}
       {button[1] && <button className="bg-red-300 py-1 px-2 rounded-md z-2" onClick={()=>backStatus()}>{button[1]}</button>}
-      </div>
+      </div>)}
     </div>
   )
 }

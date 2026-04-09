@@ -61,13 +61,24 @@ const user = JSON.parse(Cookies.get('user'));
     //     }));
     // };
     
+    console.log(customerToken?.customer_id)
     const genOrder = async () => {
         try {
             const billId = bill[customerToken?.customer_id]||null;
-            let response = await axios.post('http://localhost:3000/order', {
+            let response
+            if(billId){
+                response = await axios.post('http://localhost:3000/order', {
                 bill_id: billId,
                 customer_id: customerToken?.customer_id
-            });
+            });}else{
+                let createBill = await axios.post('http://localhost:3000/bill', {
+                    customer_id: customerToken?.customer_id
+                })
+                response = await axios.post('http://localhost:3000/order', {
+                    bill_id: createBill?.bill_id,
+                    customer_id: customerToken?.customer_id
+                });}
+
             console.log('Order placed successfully:', response.data);
             for (const item of selectedItems) {
                 await axios.post('http://localhost:3000/orderitems', {
@@ -113,11 +124,11 @@ const user = JSON.parse(Cookies.get('user'));
 
     return (
         <div>
-            <div className='py-20 mx-4 md:flex sm:mx-16 gap-16'>
+            <div className='py-16 mx-2 sm:mx-8 md:flex gap-10 max-h-fit overflow-hidden'>
                 {selectedItems?.length > 0 && (
-                    <div className="flex-1">
+                    <div className="flex flex-col min-w-fit md:w-auto h-screen overflow-y-auto p-4 bg-gray-100 rounded-md gap-4">
                         <h1 className="text-2xl font-bold">Items</h1>
-                        <table className="w-full mt-5 text-left">
+                        <table className="w-full text-left">
                             <thead>
                                 <tr className="bg-gray-200">
                                     <th className="py-2 px-4 w-1/6">No.</th>
@@ -140,11 +151,11 @@ const user = JSON.parse(Cookies.get('user'));
                             <SearchBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
                         </form>}
                         <div className="w-full justify-center">
-                            <button className="w-fit" onClick={genOrder}>Proceed</button>
+                            <button className="w-fit bg-blue-400 p-1 rounded-md text-center hover:bg-blue-600" onClick={genOrder}>Proceed</button>
                         </div>
                     </div>
                 )}
-                <div className="w-full">
+                <div className="w-full h-screen overflow-y-auto">
                     {Array.from(options)?.map((option, index) => (
                         <div key={index} className="my-10">
                             <h1 className="text-xl font-bold">{option}</h1>
